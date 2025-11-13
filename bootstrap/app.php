@@ -18,30 +18,30 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
         ]);
 
-        // --- Grup middleware WEB (Sudah Diperbaiki) ---
+        // --- Grup middleware WEB (Disimplifikasi) ---
         $middleware->web(append: [
-            // [FIX] Menggunakan namespace Illuminate untuk Cookie
             \Illuminate\Cookie\Middleware\EncryptCookies::class, 
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             
-            // Standard session management
             \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\Session\Middleware\AuthenticateSession::class, // FIX 2FA
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             
-            // Middleware Jetstream untuk memastikan sesi terotentikasi penuh
+            // INI ADALAH MIDDLEWARE OTENTIKASI UTAMA UNTUK JETSTREAM
             \Laravel\Jetstream\Http\Middleware\AuthenticateSession::class, 
+            
+            // [TINDAKAN] SubstituteBindings Dihapus dari 'web' untuk mencegah konflik RequestGuard/SessionGuard
+            
         ])
-        
-        // [FIX] CSRF Token divalidasi menggunakan metode modern
         ->validateCsrfTokens(except: [
-            // Masukkan rute API yang perlu dikecualikan dari CSRF di sini jika ada
+            // ...
         ]);
         
         // --- Grup middleware API ---
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:60,1',
+            
+            // SubstituteBindings HANYA ada di sini
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
     })

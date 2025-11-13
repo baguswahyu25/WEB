@@ -7,7 +7,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 
-    @section('title', 'Login - DriveNusa')
+    <title>{{ config('app.name') }}</title>
     {{-- @include('layouts.load') --}}
 
     <style>
@@ -79,12 +79,17 @@
                 <!-- Username / Email -->
                 <div class="mb-4">
                     <label for="email" class="block text-gray-700 mb-1 font-medium">Username atau Email</label>
+
                     <input id="email" name="email" type="text" placeholder="Masukkan username atau email"
                         value="{{ old('email') }}" {{-- PENTING: Menjaga input setelah validasi gagal --}} required autofocus autocomplete="username"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#02104A] focus:border-transparent transition-all duration-200 shadow-sm
                         @error('email') border-red-500 @enderror">
+
+                    <x-input id="email" type="text" name="email" placeholder="Masukkan username anda"
+                        class="mt-4" />
+
                     @error('email')
-                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        <p class="text-sm text-red-500 mt-1">{{ 'email anda salah kawan' }}</p>
                     @enderror
                 </div>
 
