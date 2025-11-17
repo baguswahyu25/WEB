@@ -15,16 +15,23 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+
     <!-- Styles -->
     @livewireStyles
 </head>
 
-<body>
+<body class="min-h-screen bg-gradient-to-b from-white to-[#02104A] flex flex-col justify-between">
+
     <div class="font-sans text-gray-900 antialiased">
         {{ $slot }}
     </div>
 
+
+
+
     @livewireScripts
 </body>
+
+
 
 </html>
