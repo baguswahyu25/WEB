@@ -4,11 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\VerificationController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Api\ForgotPasswordController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\FormSimController;
 
 
 
@@ -43,3 +44,5 @@ Route::post('/forgot-password', function (Request $request) {
 // =======================================
 Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'])
     ->name('api.password.reset');
+
+Route::post('/form/sim', [FormSimController::class, 'store']);
