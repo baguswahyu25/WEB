@@ -27,18 +27,26 @@ class FormController extends Controller
             'user_id' => $request->user()->id,
             'nama_lengkap' => $validated['nama_lengkap'],
             'ttl' => $validated['ttl'],
-            'alamat' => $validated['alamat'],
+
+            // FIX NAMA KOLOM
+            'alamat_lengkap' => $validated['alamat'],
+
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'pekerjaan' => $validated['pekerjaan'],
-            'mobil' => $validated['mobil'],
+
+            // FIX NAMA KOLOM
+            'nama_mobil' => $validated['mobil'],
+
             'metode_pembayaran' => $validated['metode_pembayaran'],
             'opsi_kredit' => $validated['opsi_kredit'] ?? null,
 
-            // ⬇️ Simpan paket kursus
-            'paket_kursus' => $validated['paket_kursus'],
+            // FIX NAMA KOLOM
+            'paket' => $validated['paket_kursus'],
 
+            'konfirmasi' => true, // opsional
             'created_at' => now(),
         ]);
+
 
         return response()->json([
             'message' => 'Data berhasil disimpan'

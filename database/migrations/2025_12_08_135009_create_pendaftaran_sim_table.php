@@ -9,26 +9,30 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pendaftaran_sim', function (Blueprint $table) {
-            $table->id();
+    $table->id();
 
-            $table->unsignedBigInteger('user_id');
-            $table->string('paket');
+    $table->unsignedBigInteger('user_id')->nullable(); 
+    $table->string('paket');
 
-            $table->string('nama_lengkap');
-            $table->string('ttl'); // TEMPAT + TANGGAL LAHIR (digabung jadi satu)
-            $table->text('alamat');
-            $table->string('jenis_kelamin');
-            $table->string('pekerjaan');
+    $table->string('nama_lengkap');
+    $table->string('ttl');
+    $table->text('alamat');
+    $table->string('jenis_kelamin');
+    $table->string('pekerjaan');
 
-            $table->string('mobil_dipilih');
-            $table->string('metode_pembayaran');
-            $table->string('opsi_kredit')->nullable();
+    $table->string('mobil_dipilih');
+    $table->string('metode_pembayaran');
+    $table->string('opsi_kredit')->nullable();
 
-            $table->text('ktp_url')->nullable();
-            $table->text('kk_url')->nullable();
+    $table->text('pas_foto_url')->nullable();
+    $table->text('ktp_url')->nullable();
 
-            $table->timestamps();
-        });
+    $table->integer('harga')->default(0);
+    $table->timestamp('tanggal_daftar')->nullable();
+
+    $table->timestamps();
+});
+
     }
 
     public function down(): void

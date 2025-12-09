@@ -45,4 +45,5 @@ Route::post('/forgot-password', function (Request $request) {
 Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'])
     ->name('api.password.reset');
 
-Route::post('/form/sim', [FormSimController::class, 'store']);
+Route::post('form-sim', [FormSimController::class, 'store']);
+
