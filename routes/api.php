@@ -12,7 +12,7 @@ use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormSimController;
 
 
-Route::middleware('auth:sanctum', 'check.active')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/user/update', [UserController::class, 'update']);
     Route::post('/logout', [AuthController::class, 'logout']);

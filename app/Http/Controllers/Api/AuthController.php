@@ -92,8 +92,9 @@ public function user(Request $request)
 
     if (!$user) {
         return response()->json([
-            'message' => 'Unauthenticated'
-        ], 401);
+            'message' => 'Unauthenticated',
+            'force_logout' => true
+        ], 401); // penting!
     }
 
     return response()->json($user);
