@@ -6,12 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Exception;
+use Illuminate\Http\JsonResponse;
 
 class FormSimController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $rules = [
             'paket' => 'required|string',
             'nama_lengkap' => 'required|string',
             'ttl' => 'required|string',
@@ -22,52 +24,66 @@ class FormSimController extends Controller
             'metode_pembayaran' => 'required|string',
             'opsi_kredit' => 'nullable|string',
             'harga' => 'nullable|integer',
-            'pas_foto' => 'required|image|max:5120',
-            'ktp' => 'required|image|max:5120',
-        ]);
 
-        // Simpan file ke storage/app/public/...
-        $pasFotoPath = $request->file('pas_foto')->store('pas_foto', 'public');
-        $ktpPath = $request->file('ktp')->store('ktp', 'public');
+            'pas_foto' => 'required|file|image|max:5120',
+            'ktp' => 'required|file|image|max:5120',
+        ];
 
-        $pasFotoUrl = url('storage/' . $pasFotoPath);
-        $ktpUrl = url('storage/' . $ktpPath);
+        try {
+            $validated = $request->validate($rules);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        }
 
-        // Ambil user id jika tersedia (token), else null
-        $userId = optional($request->user())->id;
+        try {
 
-        DB::table('pendaftaran_sim')->insert([
-            'user_id' => $userId,
-            'paket' => $validated['paket'],
+            DB::beginTransaction();
 
-            'nama_lengkap' => $validated['nama_lengkap'],
-            'ttl' => $validated['ttl'],
-            'alamat' => $validated['alamat'],
-            'jenis_kelamin' => $validated['jenis_kelamin'],
-            'pekerjaan' => $validated['pekerjaan'],
+            $pasFotoPath = $request->file('pas_foto')->store('form_sim/pas_foto', 'public');
+            $ktpPath     = $request->file('ktp')->store('form_sim/ktp', 'public');
 
-            'mobil_dipilih' => $validated['mobil'],
-            'metode_pembayaran' => $validated['metode_pembayaran'],
-            'opsi_kredit' => $validated['opsi_kredit'] ?? null,
+            $id = DB::table('pendaftaran_sim')->insertGetId([
+                'paket'             => $validated['paket'],
+                'nama_lengkap'      => $validated['nama_lengkap'],
+                'ttl'               => $validated['ttl'],
+                'alamat'            => $validated['alamat'],
+                'jenis_kelamin'     => $validated['jenis_kelamin'],
+                'pekerjaan'         => $validated['pekerjaan'],
+                'mobil_dipilih'     => $validated['mobil'],
+                'metode_pembayaran' => $validated['metode_pembayaran'],
+                'opsi_kredit'       => $validated['opsi_kredit'] ?? null,
+                'harga'             => $validated['harga'] ?? 0,
 
-            'pas_foto_url' => $pasFotoUrl,
-            'ktp_url' => $ktpUrl,
+                'pas_foto_url'      => $pasFotoPath,
+                'ktp_url'           => $ktpPath,
 
-            'harga' => $validated['harga'] ?? 0,
-            'tanggal_daftar' => now(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+                'tanggal_daftar'    => now(),
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'status' => true,
-            'message' => 'Pendaftaran SIM berhasil disimpan',
-            'data' => [
-                'pas_foto_url' => $pasFotoUrl,
-                'ktp_url' => $ktpUrl
-            ]
-        ]);
+            DB::commit();
 
+            return response()->json([
+                'success' => true,
+                'status'  => true,
+                'message' => 'Data Form SIM berhasil disimpan',
+                'id'      => $id
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'status'  => false,
+                'message' => 'Terjadi kesalahan server',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -12,8 +12,7 @@ use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormSimController;
 
 
-
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum', 'check.active')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/user/update', [UserController::class, 'update']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -46,4 +45,12 @@ Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'
     ->name('api.password.reset');
 
 Route::post('form-sim', [FormSimController::class, 'store']);
+Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
+    return response()->json([
+        'success' => true,
+        'user' => $request->user()
+    ]);
+});
+
+
 

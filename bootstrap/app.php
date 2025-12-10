@@ -17,7 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
         ]);
-
         // --- Grup middleware WEB (Disimplifikasi) ---
         $middleware->web(append: [
             \Illuminate\Cookie\Middleware\EncryptCookies::class, 
@@ -32,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // [TINDAKAN] SubstituteBindings Dihapus dari 'web' untuk mencegah konflik RequestGuard/SessionGuard
             
         ])
+
         ->validateCsrfTokens(except: [
             // ...
         ]);
@@ -49,3 +49,6 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->create();
+    $middleware->alias([
+    'check.active' => \App\Http\Middleware\CheckUserActive::class,
+]);

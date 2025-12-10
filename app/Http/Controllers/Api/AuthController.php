@@ -38,8 +38,6 @@ public function register(Request $request)
     ], 201);
 }
 
-
-    // LOGIN
     public function login(Request $request)
     {
         $request->validate([
@@ -49,30 +47,62 @@ public function register(Request $request)
 
         $user = User::where('email', $request->email)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Email atau password salah.'],
             ]);
         }
 
+        // CEK EMAIL VERIFIED
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Email belum diverifikasi. Silakan cek email Anda.',
+                'status' => false
+            ], 403);
+        }
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Akun tidak ditemukan'], 404);
+        }
+
+        if ($user->deleted_at != null) {
+            return response()->json(['message' => 'Akun telah dihapus'], 403);
+        }
+
+
+        // HAPUS TOKEN LAMA UNTUK KEAMANAN
+        $user->tokens()->delete();
+
+        // BUAT TOKEN BARU
         $token = $user->createToken('mobile_token')->plainTextToken;
 
         return response()->json([
+            'message' => 'Login berhasil',
+            'status' => true,
             'user' => $user,
             'token' => $token,
         ]);
     }
 
-    // USER PROFILE
-    public function user(Request $request)
-    {
-        return response()->json($request->user());
+    // PROFILE USER
+public function user(Request $request)
+{
+    $user = $request->user();
+
+    if (!$user) {
+        return response()->json([
+            'message' => 'Unauthenticated'
+        ], 401);
     }
 
+    return response()->json($user);
+}
     // LOGOUT
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out']);
+        $request->user()->currentAccessToken()?->delete();
+
+        return response()->json(['message' => 'Logged out'], 200);
     }
 }
