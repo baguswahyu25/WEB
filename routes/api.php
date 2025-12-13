@@ -9,11 +9,12 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Api\ForgotPasswordController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\FormPendaftaranController;
+use App\Http\Controllers\Api\ProfileController;
 
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
-    Route::post('/user/update', [UserController::class, 'update']);
+    Route::post('/user/update', [ProfileController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/email/resend', [VerificationController::class, 'resend'])
         ->name('api.verification.resend');

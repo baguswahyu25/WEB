@@ -50,15 +50,22 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
+    
 
     /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
      */
-    protected $appends = [
-        'profile_photo_url',
-    ];
+protected $appends = ['avatar_url_full'];
+
+public function getAvatarUrlFullAttribute()
+{
+    return $this->avatar_url
+        ? Storage::url($this->avatar_url)
+        : null;
+}
+
 
     /**
      * Get the attributes that should be cast.

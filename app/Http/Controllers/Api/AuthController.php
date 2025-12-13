@@ -6,38 +6,37 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     // REGISTER
-public function register(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|unique:users',
-        'password' => 'required|string|min:8',
-    ]);
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
 
-    $user = User::create([
-        'name' => $validated['name'],
-        'email' => $validated['email'],
-        'password' => Hash::make($validated['password']),
-    ]);
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
 
-    // ===========================
-    // OTOMATIS KIRIM EMAIL VERIFIKASI
-    // ===========================
-    $user->sendEmailVerificationNotification();
+        $user->sendEmailVerificationNotification();
 
-    $token = $user->createToken('mobile_token')->plainTextToken;
+        $token = $user->createToken('mobile_token')->plainTextToken;
 
-    return response()->json([
-        'user' => $user,
-        'token' => $token,
-    ], 201);
-}
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+        ], 201);
+    }
 
+    // LOGIN
     public function login(Request $request)
     {
         $request->validate([
@@ -53,28 +52,19 @@ public function register(Request $request)
             ]);
         }
 
-        // CEK EMAIL VERIFIED
         if (!$user->hasVerifiedEmail()) {
             return response()->json([
                 'message' => 'Email belum diverifikasi. Silakan cek email Anda.',
                 'status' => false
             ], 403);
         }
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'Akun tidak ditemukan'], 404);
-        }
 
         if ($user->deleted_at != null) {
             return response()->json(['message' => 'Akun telah dihapus'], 403);
         }
 
-
-        // HAPUS TOKEN LAMA UNTUK KEAMANAN
         $user->tokens()->delete();
 
-        // BUAT TOKEN BARU
         $token = $user->createToken('mobile_token')->plainTextToken;
 
         return response()->json([
@@ -85,8 +75,8 @@ public function register(Request $request)
         ]);
     }
 
-    // PROFILE USER
-public function user(Request $request)
+    // GET USER PROFILE
+    public function user(Request $request)
 {
     $user = $request->user();
 
@@ -94,16 +84,24 @@ public function user(Request $request)
         return response()->json([
             'message' => 'Unauthenticated',
             'force_logout' => true
-        ], 401); // penting!
+        ], 401);
     }
 
-    return response()->json($user);
+    return response()->json([
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'email_verified_at' => $user->email_verified_at,
+        'profile_photo_url' => $user->profile_photo_url, // Jetstream built-in
+    ]);
 }
+
+
+
     // LOGOUT
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()?->delete();
-
         return response()->json(['message' => 'Logged out'], 200);
     }
 }
