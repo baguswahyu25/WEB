@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +26,7 @@
             padding: 30px 25px;
             border-radius: 18px;
             text-align: center;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
             animation: fadeIn 0.6s ease-out;
         }
 
@@ -75,18 +76,26 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="card">
 
         <div class="icon-success">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M9 16.17l-3.88-3.88L4 13.41 9 18.41 20 7.41 18.59 6l-9.59 9.59z"/>
+                <path d="M9 16.17l-3.88-3.88L4 13.41 9 18.41 20 7.41 18.59 6l-9.59 9.59z" />
             </svg>
         </div>
 
@@ -96,8 +105,9 @@
             Akun kamu sekarang dapat digunakan sepenuhnya.
         </div>
 
-        <a href="/" class="btn">Kembali ke Aplikasi</a>
+        <p>Silakan Login ulang</p>
     </div>
 
 </body>
+
 </html>

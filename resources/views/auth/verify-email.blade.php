@@ -24,7 +24,7 @@
     <main class="flex flex-col items-center justify-center flex-grow px-4 py-10 ">
 
         <div class="absolute top-[75px] left-5 flex items-center gap-2">
-            <img src="{{ asset('img/logo.png') }}" alt="Logo" class="h-[125px] w-auto">
+            <img src="{{ asset('img/logo2.png') }}" alt="Logo" class="h-[125px] w-auto">
         </div>
 
         <div

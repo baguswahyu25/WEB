@@ -8,6 +8,10 @@ Route::get('/', function () {
     return view('index');
 });
 
+Route::get('/paket', function () {
+    return view('paketkursus');
+});
+
 // Dashboard protect
 Route::middleware([
     'auth',

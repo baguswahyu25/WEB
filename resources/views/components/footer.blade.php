@@ -86,8 +86,7 @@
 <body>
 
 
-    <div id="scroll-progress" class="fixed top-[64px] left-0 h-1 bg-[#0928a4] z-[9999] w-0 transition-all duration-250">
-    </div>
+
 
     <!-- Footer -->
     <footer class="bg-[#02104A] text-white py-8">
@@ -95,7 +94,7 @@
 
             <!-- Logo -->
             <div class="flex justify-center md:justify-start mt-[-10px]">
-                <img src="{{ asset('img/logop.png') }}" alt="Logo" class="h-[100px] md:h-[115px] w-auto">
+                <img src="{{ asset('img/logop.png') }}" alt="Logo" class="h-[125px] md:h-[115px] w-auto">
             </div>
 
             <!-- Tautan Fitur -->
@@ -107,31 +106,31 @@
                     <li>
                         <a href="#" class="flex items-center gap-2 hover:underline">
                             <!-- Placeholder Ikon: Ganti dengan <img src="..."> Anda -->
-                            <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon">
+                            {{-- <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon"> --}}
                             Beranda
                         </a>
                     </li>
                     <li>
                         <a href="#" class="flex items-center gap-2 hover:underline">
-                            <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon">
+                            {{-- <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon"> --}}
                             Tentang Kami
                         </a>
                     </li>
                     <li>
                         <a href="#" class="flex items-center gap-2 hover:underline">
-                            <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon">
+                            {{-- <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon"> --}}
                             Kursus
                         </a>
                     </li>
                     <li>
                         <a href="#" class="flex items-center gap-2 hover:underline">
-                            <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon">
+                            {{-- <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon"> --}}
                             Jual Beli Unit
                         </a>
                     </li>
                     <li>
                         <a href="#" class="flex items-center gap-2 hover:underline">
-                            <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon">
+                            {{-- <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon"> --}}
                             Support
                         </a>
                     </li>
@@ -147,13 +146,13 @@
                     <!-- LIST ITEM DENGAN IKON -->
                     <li>
                         <a href="#" class="flex items-center gap-2 hover:underline">
-                            <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon">
+                            {{-- <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon"> --}}
                             Certivicate Holder
                         </a>
                     </li>
                     <li>
                         <a href="#" class="flex items-center gap-2 hover:underline">
-                            <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon">
+                            {{-- <img src="{{ asset('img/lbes.png') }}" class="w-4 h-4 flex-shrink-0" alt="Icon"> --}}
                             Support
                         </a>
                     </li>
@@ -214,8 +213,8 @@
 
     </footer>
 
-    <!-- Bagian bawah footer -->
-    <div class="bg-[#f89331] text-white py-[4px]">
+    <!-- Bagian bawah footer   #f89331 -->
+    <div class="bg-[#02104A] text-white py-[4px]">
 
 
         <!-- Copyright -->
@@ -249,12 +248,12 @@
 
         <div class="flex flex-col items-center">
 
-            <img src="{{ asset('img/logo.png') }}" alt="Drive Nusa Loading"
-                class="h-[130px] w-auto mb-6 object-contain" />
+            {{-- <img src="{{ asset('img/logo.png') }}" alt="Drive Nusa Loading"
+                class="h-[130px] w-auto mb-6 object-contain" /> --}}
 
             <div class="loader"></div>
 
-            <p class="mt-6 text-sm text-gray-600">Sedang mempersiapkan...</p>
+            {{-- <p class="mt-6 text-sm text-gray-600">Sedang mempersiapkan...</p> --}}
         </div>
     </div>
     <!-- END: Preloader Animasi L23 Kustom -->
@@ -281,7 +280,7 @@
         const FADE_OUT_DURATION = 700;
 
         // Delay Tambahan untuk melihat animasi (3000ms = 3 detik)
-        const ADDITIONAL_DELAY = 3000;
+        const ADDITIONAL_DELAY = 0;
 
         // Kunci scroll segera setelah script berjalan
         document.body.style.overflow = 'hidden';
@@ -321,8 +320,6 @@
             scrollProgress.style.width = scrollPercent + '%';
         });
     </script>
-
-
 
 
     @vite(['resources/js/app.js'])

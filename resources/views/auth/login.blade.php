@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - JagoStir</title>
+    <title>Login - DriveNusa</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
@@ -27,7 +27,7 @@
     <main class="flex flex-col items-center justify-center flex-grow px-4 py-10 ">
         <!-- Logo -->
         <div class="absolute top-[75px] left-5 flex items-center gap-2">
-            <img src="{{ asset('img/logo.png') }}" alt="Logo" class="h-[125px] w-auto">
+            <img src="{{ asset('img/logo2.png') }}" alt="Logo" class="h-[125px] w-auto">
         </div>
 
         <!-- Card Form -->
