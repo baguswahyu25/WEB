@@ -18,10 +18,11 @@ class FormPendaftaranController extends Controller
             'nama_lengkap'      => 'required|string',
 
             'tempat_lahir'      => 'required|string',
-            'tanggal_lahir'     => 'required|date',
+            'tanggal_lahir' => 'required|date_format:Y-m-d',
 
             'alamat'            => 'required|string',
-            'jenis_kelamin'     => 'required|string',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+
             'pekerjaan'         => 'required|string',
             'mobil_dipilih'             => 'required|string',
 
