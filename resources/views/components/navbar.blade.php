@@ -1,4 +1,4 @@
-<nav id="main-navbar" class="fixed top-0 left-0 right-0 z-50 h-16 transition duration-300">
+<nav id="main-navbar" class="fixed top-0 left-0 right-0 z-[100] bg-white shadow-md h-16 transition duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div class="flex justify-between items-center h-full">
 
@@ -11,51 +11,63 @@
             <div class="hidden sm:ml-6 sm:flex sm:space-x-8 h-full items-center">
 
                 {{-- Link Navigasi --}}
+                {{-- 1. Beranda --}}
                 <a href="/"
-                    class="text-gray-900 inline-flex items-center px-1 border-b-2 text-sm font-medium h-full hover:text-blue-600 border-transparent transition duration-150 transform hover:-translate-y-0.5">
+                    class="inline-flex items-center px-1  text-sm font-medium h-full transition duration-150 transform hover:-translate-y-0.5
+                   {{ request()->is('/') ? 'text-blue-600' : 'text-gray-900  hover:text-blue-600' }}">
                     Beranda
                 </a>
-                <a href="#"
-                    class="text-gray-900 inline-flex items-center px-1 border-b-2 text-sm font-medium h-full hover:text-blue-600 border-transparent transition duration-150 transform hover:-translate-y-0.5">
+
+                {{-- 2. Tentang Kami --}}
+                <a href="/tentang"
+                    class="inline-flex items-center px-1  text-sm font-medium h-full transition duration-150 transform hover:-translate-y-0.5
+                   {{ request()->is('tentang') ? 'text-blue-600' : 'text-gray-900  hover:text-blue-600' }}">
                     Tentang Kami
                 </a>
-                <a href="#"
-                    class="text-gray-900 inline-flex items-center px-1 border-b-2 text-sm font-medium h-full hover:text-blue-600 border-transparent transition duration-150 transform hover:-translate-y-0.5">
+
+                {{-- 3. Layanan Kami (Dianggap '/layanan') --}}
+                <a href="/layanan"
+                    class="inline-flex items-center px-1  text-sm font-medium h-full transition duration-150 transform hover:-translate-y-0.5
+                   {{ request()->is('layanan') ? 'text-blue-600' : 'text-gray-900  hover:text-blue-600' }}">
                     Layanan Kami
                 </a>
+
+                {{-- 4. Paket Kursus --}}
                 <a href="/paket"
-                    class="text-gray-900 inline-flex items-center px-1 border-b-2 text-sm font-medium h-full hover:text-blue-600 border-transparent transition duration-150 transform hover:-translate-y-0.5">
+                    class="inline-flex items-center px-1  text-sm font-medium h-full transition duration-150 transform hover:-translate-y-0.5
+                   {{ request()->is('paket') ? 'text-blue-600' : 'text-gray-900  hover:text-blue-600' }}">
                     Paket Kursus
                 </a>
-                <a href="#"
-                    class="text-gray-900 inline-flex items-center px-1 border-b-2 text-sm font-medium h-full hover:text-blue-600 border-transparent transition duration-150 transform hover:-translate-y-0.5">
+
+                {{-- 5. Support (Dianggap '/support') --}}
+                <a href="/support"
+                    class="inline-flex items-center px-1  text-sm font-medium h-full transition duration-150 transform hover:-translate-y-0.5
+                   {{ request()->is('support') ? 'text-blue-600' : 'text-gray-900  hover:text-blue-600' }}">
                     Support
                 </a>
 
-                {{-- Pemisah (Spacer) - Menggantikan link kosong Anda --}}
+                {{-- Pemisah (Spacer) --}}
                 <div class="w-4 h-full"></div>
 
                 {{-- **BAGIAN KONDISIONAL: LOGIN vs PROFILE** --}}
 
                 @guest
-                    <a
-                        href="/login"class=" inline-flex items-center py-1 px-4 border border-gray-900 text-sm rounded-lg text-gray-900 transition duration-300 transform hover:-translate-y-0.5  hover:border-blue-600 hover:text-blue-600 ">Login</a>
+                    <a href="/login"
+                        class="inline-flex items-center py-1 px-4 border border-gray-900 text-sm rounded-lg text-gray-900 transition duration-300 transform hover:-translate-y-0.5 hover:border-blue-600 hover:text-blue-600 ">Login</a>
                 @endguest
 
                 @auth
                     {{-- TAMPILAN JIKA SUDAH LOGIN (Profile/Dropdown) --}}
-                    {{-- Hapus kelas 'group' karena kita akan menggunakan JS untuk klik --}}
                     <div class="relative">
 
                         {{-- Avatar atau Nama Pengguna (TRIGGER) --}}
-                        {{-- Tambahkan id untuk JS dan onClick --}}
                         <button id="profile-dropdown-button" type="button"
                             class="flex items-center text-gray-900 hover:text-blue-600 focus:outline-none transition duration-150 transform hover:-translate-y-0.5 py-2">
 
                             {{-- Menggunakan Nama atau Avatar --}}
-                            <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ asset('img/logo2.png') }}"
+                            <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ asset('img/N.png') }}"
                                 alt="{{ Auth::user()->name }}">
-                            <span class="text-sm font-medium hidden lg:inline">{{ Auth::user()->name }}</span>
+                            <span class="text-sm font-medium hidden lg:inline">{{ Auth::user()->name ?? 'Pengguna' }}</span>
 
                             {{-- Chevron Down Icon --}}
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,68 +77,55 @@
                         </button>
 
                         {{-- Dropdown Menu (KONTEN) --}}
-                        {{-- 2. DROP DOWN MENU --}}
-                        <div id="profile-dropdown-menu" {{-- Styling Dropdown --}}
+                        <div id="profile-dropdown-menu"
                             class="absolute right-0 mt-2 w-64 rounded-md shadow-2xl py-0 z-50 hidden 
-                   overflow-hidden border border-gray-700">
+                    overflow-hidden border border-gray-700">
 
-                            {{-- A. HEADER PROFIL (Sesuai Gambar: Nama & Email) --}}
-                            <div class="flex items-center p-4 border-b border-gray-700  bg-[#ffb144]">
-                                <img class="h-10 w-10 rounded-full object-cover mr-3" src="{{ asset('img/logo2.png') }}"
+                            {{-- A. HEADER PROFIL --}}
+                            <div class="flex items-center p-4 border-b border-gray-700 bg-[#ffb144]">
+                                <img class="h-10 w-10 rounded-full object-cover mr-3" src="{{ asset('img/N.png') }}"
                                     alt="{{ Auth::user()->name }}">
 
                                 <div>
-                                    {{-- Nama Pengguna --}}
                                     <p class="text-base font-semibold">{{ Auth::user()->name ?? 'Pengguna' }}</p>
-                                    {{-- Email Pengguna --}}
-                                    <p class="text-xs text-gray-400 font-light">
+                                    <p class="text-xs text-gray-700 font-light">
                                         {{ Auth::user()->email ?? 'user@example.com' }}</p>
                                 </div>
                             </div>
 
-                            {{-- B. LIST MENU (Sesuai Gambar) --}}
-                            <div class="py-2">
-
-                                {{-- My Profile --}}
+                            {{-- B. LIST MENU --}}
+                            <div class="py-2 bg-white">
                                 <a href="{{ route('profile.show') }}"
-                                    class="block px-4 py-3 text-sm hover:bg-[#ffffff] transition duration-100">
+                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
                                     My Profile
                                 </a>
-
-                                {{-- Settings --}}
                                 <a href="/settings"
-                                    class="block px-4 py-3 text-sm hover:bg-[#ffffff] transition duration-100">
+                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
                                     Settings
                                 </a>
-
-                                {{-- Billing --}}
                                 <a href="/billing"
-                                    class="block px-4 py-3 text-sm hover:bg-[#ffffff] transition duration-100">
+                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
                                     Billing
                                 </a>
-
-                                {{-- FAQs --}}
                                 <a href="/faqs"
-                                    class="block px-4 py-3 text-sm hover:bg-[#ffffff] transition duration-100">
+                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
                                     FAQs
                                 </a>
                             </div>
 
                             {{-- C. FOOTER (Logout) --}}
-                            <div class="border-t border-gray-700">
+                            <div class="border-t border-gray-200 bg-white">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="block w-full text-left px-4 py-3 text-sm hover:bg-[#ffffff] transition duration-100">
+                                        class="block w-full text-left px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
                                         Logout
                                     </button>
                                 </form>
                             </div>
-
                         </div>
                     </div>
                 @endauth
-
             </div>
         </div>
     </div>

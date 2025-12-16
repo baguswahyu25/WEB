@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ForgotPasswordController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\FormPendaftaranController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\MidtransNotificationController;
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -54,6 +55,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/pendaftaran', [FormPendaftaranController::class, 'store']);
     });
 });
+
+
 
 
 

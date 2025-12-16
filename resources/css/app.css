@@ -22,3 +22,12 @@
         scrollbar-width: none;  /* Firefox */
     }
 }
+
+
+.input {
+    width: 100%;
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}

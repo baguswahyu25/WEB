@@ -12,21 +12,15 @@
 
         <!-- CARD MANUAL -->
         <div class="relative w-full max-w-sm bg-[#FFF3E0] border border-gray-300 rounded-3xl p-6 flex flex-col">
-
             <span
                 class="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-6 py-2 rounded-full shadow text-sm text-gray-700">
                 Transmisi manual
             </span>
-
             <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-2">Manual</h2>
-            <p class="text-gray-700 mb-6">
-                Cocok untuk kamu yang ingin belajar mengendarai mobil manual dari dasar maupun melancarkan
-            </p>
-
+            <p class="text-gray-700 mb-6">Cocok untuk kamu yang ingin belajar mengendarai mobil manual...</p>
             <div class="bg-white rounded-xl shadow p-4 mb-6 flex justify-center">
-                <img src="path/to/manual-car-image.png" alt="Manual" class="max-h-40 object-contain">
+                <img src="img/M.png" alt="Manual" class="max-h-40 object-contain">
             </div>
-
             <div class="mb-8">
                 <h4 class="font-semibold mb-3">Benefit kursus:</h4>
                 <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside marker:text-orange-400">
@@ -37,12 +31,12 @@
                     <li>14 pertemuan</li>
                 </ul>
             </div>
-
-            <button
-                class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow">
+            <a href="{{ route('bayar.show', ['paket' => 'Manual', 'harga' => 2150000]) }}"
+                class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
                 Rp 2.150.000
-            </button>
+            </a>
         </div>
+
 
         <!-- CARD MATIC (POPULAR) -->
         <div

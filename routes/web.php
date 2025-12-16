@@ -3,6 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\Auth\CustomResetPasswordController;
+use App\Http\Controllers\WebPendaftaranController;
+
+Route::get('/bayar', [WebPendaftaranController::class, 'showForm'])->name('bayar.show');
+Route::post('/bayar/init', [WebPendaftaranController::class, 'initPayment'])->name('bayar.init');
+Route::post('/bayar/callback', [WebPendaftaranController::class, 'handleCallback'])->name('bayar.callback');
+
 
 Route::get('/', function () {
     return view('index');
@@ -10,6 +16,22 @@ Route::get('/', function () {
 
 Route::get('/paket', function () {
     return view('paketkursus');
+});
+
+Route::get('/tentang', function () {
+    return view('tentangkami');
+});
+
+Route::get('/layanan', function () {
+    return view('layanankami');
+});
+
+Route::get('/support', function () {
+    return view('suport');
+});
+
+Route::get('/daftar', function () {
+    return view('pembayaran');
 });
 
 // Dashboard protect

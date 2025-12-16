@@ -4,73 +4,29 @@
 
     <x-herosection />
 
-    <!-- Hero / Slider -->
-    <section id="home" class="relative w-full overflow-hidden h-[490px] pt-20 -mt-20">
-        <div class="slider flex transition-transform duration-700 ease-in-out">
-            <div class="flex-shrink-0 w-full h-[490px]">
-                <img src="{{ asset('img/1.png') }}" alt="Slide 1" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-shrink-0 w-full h-[490px]">
-                <img src="{{ asset('img/2.png') }}" alt="Slide 2" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-shrink-0 w-full h-[490px]">
-                <img src="{{ asset('img/3.png') }}" alt="Slide 3" class="w-full h-full object-cover">
-            </div>
-            <!-- Duplikasi slide pertama -->
-            <div class="flex-shrink-0 w-full h-[490px]">
-                <img src="{{ asset('img/1.png') }}" alt="Slide 1 clone" class="w-full h-full object-cover">
-            </div>
-        </div>
+    <x-informasi />
 
-        <!-- Indicator -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            <div class="dot w-3 h-3 bg-white rounded-full opacity-100"></div>
-            <div class="dot w-3 h-3 bg-white rounded-full opacity-60"></div>
-            <div class="dot w-3 h-3 bg-white rounded-full opacity-60"></div>
-        </div>
-    </section>
 
-    <script>
-        const slider = document.querySelector(".slider");
-        const slides = slider.children;
-        const dots = document.querySelectorAll(".dot");
-        const totalSlides = slides.length;
-        let slideIndex = 0;
 
-        function showSlide(index) {
-            slider.style.transform = `translateX(-${index * 100}%)`;
-            dots.forEach((dot, i) => {
-                dot.classList.toggle("opacity-100", i === index % (totalSlides - 1));
-                dot.classList.toggle("opacity-60", i !== index % (totalSlides - 1));
-            });
-        }
+    <x-tentangkami />
 
-        setInterval(() => {
-            slideIndex++;
-            slider.style.transition = "transform 0.7s ease-in-out";
-            showSlide(slideIndex);
+    <x-layanankami />
 
-            // Saat mencapai duplikasi terakhir, langsung reset tanpa animasi
-            if (slideIndex === totalSlides - 1) {
-                setTimeout(() => {
-                    slider.style.transition = "none";
-                    slideIndex = 0;
-                    showSlide(slideIndex);
-                }, 700);
-            }
-        }, 4000);
-    </script>
-    {{-- end hero slide --}}
+    <x-paker-kursus />
+
+
+    <x-instruktur />
 
 
 
 
+    <x-kontakkami />
+    <x-kirimpesan />
+
+    <x-lokasi />
 
 
     <x-footer>
     </x-footer>
-
-
-
 
 </x-app-layout>
