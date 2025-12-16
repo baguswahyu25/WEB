@@ -3,8 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\Auth\CustomResetPasswordController;
-use App\Http\Controllers\WebSocketController;
-use App\Http\Controllers\NotificationController;
+
 
 Route::get('/', function () {
     return view('index');
@@ -43,8 +42,3 @@ Route::get('/reset-password-success', function () {
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
     ->middleware(['signed'])   // hanya signed, supaya tidak 403
     ->name('verification.verify');
-
-    Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/notifications/connect', [WebSocketController::class, 'connect']);
-    Route::post('/notifications/send', [NotificationController::class, 'send']); // untuk push notif
-});

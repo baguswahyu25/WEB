@@ -3,19 +3,41 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\WebSocket\NotificationServer;
+use App\Models\DeviceToken;
+use Illuminate\Support\Facades\Http;
 
 class NotificationController extends Controller
 {
     public function send(Request $request)
     {
-        $userId = $request->input('user_id');
-        $type = $request->input('type'); // pengingat / promo / produk / app_update
-        $message = $request->input('message');
+        $request->validate([
+            'title' => 'required|string',
+            'body' => 'required|string',
+            'type' => 'nullable|string', // promo/jadwal/paket
+        ]);
 
-        $wsServer = app(NotificationServer::class);
-        $wsServer->sendToUser($userId, compact('type','message'));
+        $tokens = DeviceToken::pluck('token')->toArray();
 
-        return response()->json(['success' => true]);
+        if(empty($tokens)){
+            return response()->json(['message' => 'No device tokens found']);
+        }
+
+        $payload = [
+            'registration_ids' => $tokens,
+            'notification' => [
+                'title' => $request->title,
+                'body' => $request->body,
+            ],
+            'data' => [
+                'type' => $request->type ?? 'general',
+            ],
+        ];
+
+        $response = Http::withHeaders([
+            'Authorization' => 'key=' . env('FCM_SERVER_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://fcm.googleapis.com/fcm/send', $payload);
+
+        return $response->json();
     }
 }

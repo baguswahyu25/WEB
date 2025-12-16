@@ -12,7 +12,8 @@ use App\Http\Controllers\FormPendaftaranController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\Api\PromoController;
-
+use App\Http\Controllers\DeviceTokenController;
+use App\Http\Controllers\Api\FcmController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
@@ -88,6 +89,25 @@ Route::post('/user/notification-preference', [UserController::class, 'updateNoti
 Route::get('/promos', [PromoController::class, 'index']);
 Route::get('/promos/{id}', [PromoController::class, 'show']);
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post(
+        '/promo/send-notification',
+        [PromoController::class, 'sendPromoNotification']
+    );
+});
+// =====================
+// FCM (ANDROID)
+// =====================
+// =====================
+// FCM (ANDROID)
+// =====================
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/fcm/token', [FcmController::class, 'storeToken']);
+    // Route::post('/fcm/send', [FcmController::class, 'send']); // aktifkan nanti
+});
 
-
-
+// Route::post('/fcm/test', function () {
+//     return response()->json([
+//         'status' => 'API FCM OK'
+//     ]);
+// });
