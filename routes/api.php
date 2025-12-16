@@ -10,7 +10,13 @@ use App\Http\Controllers\Api\ForgotPasswordController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\FormPendaftaranController;
 use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\MidtransNotificationController;
+<<<<<<< HEAD
+=======
+use App\Http\Controllers\BotController;
+
+
+
+>>>>>>> f8e49739e5a8122807dcadd2c023d15651a33873
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -55,6 +61,31 @@ Route::prefix('v1')->group(function () {
         Route::post('/pendaftaran', [FormPendaftaranController::class, 'store']);
     });
 });
+
+Route::prefix('admin')->group(function () {
+    Route::get('/faq', [FaqController::class, 'index']);
+    Route::post('/faq', [FaqController::class, 'store']);
+    Route::put('/faq/{id}', [FaqController::class, 'update']);
+    Route::delete('/faq/{id}', [FaqController::class, 'destroy']);
+});
+/**
+ * ===========================
+ * BOT CHAT (USER)
+ * ===========================
+ */
+Route::middleware(['auth:sanctum', 'throttle:30,1'])
+    ->post('/bot/chat', [BotController::class, 'chat']);
+
+/**
+ * ===========================
+ * BOT CS (KHUSUS CS)
+ * ===========================
+ */
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/cs/waiting-chats', [BotController::class, 'waitingChats']);
+    Route::post('/cs/reply/{id}', [BotController::class, 'reply']);
+});
+
 
 
 
