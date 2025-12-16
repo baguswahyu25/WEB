@@ -4,42 +4,59 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function update(Request $request)
+    public function changePassword(Request $request)
     {
-        $user = $request->user();
-    // Tambahkan LOG DI SINI
-    \Log::info('USER UPDATE REQUEST', $request->all());
-    \Log::info('AUTH USER', ['id' => $user?->id, 'email' => $user?->email]); 
-        \Log::info('=== UPDATE HIT ===');
-    \Log::info('HEADERS', $request->headers->all());
-    \Log::info('BODY', $request->all());
-    \Log::info('FILES', $request->file());
-
         $request->validate([
-            'name' => 'required|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'old_password' => 'required',
+            'new_password' => 'required|min:6|confirmed',
         ]);
 
-        // Update name
-        $user->name = $request->name;
+        $user = $request->user();
 
-        // Upload avatar jika ada
-        if ($request->hasFile('avatar')) {
-
-            $path = $request->file('avatar')->store('avatars', 'public');
-
-            $user->avatar_url = url('storage/' . $path);
+        // ❌ password lama salah
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password lama salah'
+            ], 401);
         }
 
+        // ✅ update password
+        $user->password = Hash::make($request->new_password);
         $user->save();
 
+        // 🔐 logout semua device (opsional tapi bagus)
+        $user->tokens()->delete();
+
+        // ✅ RESPONSE SUKSES
         return response()->json([
-            'status' => true,
-            'message' => 'Profile updated',
-            'user' => $user
-        ]);
+            'success' => true,
+            'message' => 'Password berhasil diubah, silakan login ulang'
+        ], 200);
     }
+public function updateNotificationPreference(Request $request)
+{
+    $request->validate([
+        'pengingat' => 'boolean',
+        'promo' => 'boolean',
+        'pembaruan_aplikasi' => 'boolean',
+        'pembaruan_produk' => 'boolean',
+    ]);
+
+    $user = $request->user();
+
+    $user->update([
+        'notif_pengingat' => $request->pengingat,
+        'notif_promo' => $request->promo,
+        'notif_pembaruan' => $request->pembaruan_aplikasi,
+    ]);
+
+    return response()->json([
+        'success' => true
+    ]);
+}
 }

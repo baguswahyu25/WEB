@@ -11,9 +11,7 @@ use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\FormPendaftaranController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\BotController;
-
-
-
+use App\Http\Controllers\Api\PromoController;
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -22,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/email/resend', [VerificationController::class, 'resend'])
         ->name('api.verification.resend');
+        
 });
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -82,6 +81,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/cs/waiting-chats', [BotController::class, 'waitingChats']);
     Route::post('/cs/reply/{id}', [BotController::class, 'reply']);
 });
+Route::post('/user/change-password', [UserController::class, 'changePassword'])
+    ->middleware('auth:sanctum');
+Route::post('/user/notification-preference', [UserController::class, 'updateNotificationPreference'])
+    ->middleware('auth:sanctum');
+Route::get('/promos', [PromoController::class, 'index']);
+Route::get('/promos/{id}', [PromoController::class, 'show']);
 
 
 
