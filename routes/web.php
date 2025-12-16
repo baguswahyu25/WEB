@@ -10,6 +10,7 @@ Route::post('/bayar/init', [WebPendaftaranController::class, 'initPayment'])->na
 Route::post('/bayar/callback', [WebPendaftaranController::class, 'handleCallback'])->name('bayar.callback');
 
 
+
 Route::get('/', function () {
     return view('index');
 });

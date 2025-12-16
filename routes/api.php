@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\FormPendaftaranController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\BotController;
-
-
+use App\Http\Controllers\Api\PromoController;
+use App\Http\Controllers\DeviceTokenController;
+use App\Http\Controllers\Api\FcmController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
@@ -20,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/email/resend', [VerificationController::class, 'resend'])
         ->name('api.verification.resend');
+        
 });
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -80,9 +82,32 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/cs/waiting-chats', [BotController::class, 'waitingChats']);
     Route::post('/cs/reply/{id}', [BotController::class, 'reply']);
 });
+Route::post('/user/change-password', [UserController::class, 'changePassword'])
+    ->middleware('auth:sanctum');
+Route::post('/user/notification-preference', [UserController::class, 'updateNotificationPreference'])
+    ->middleware('auth:sanctum');
+Route::get('/promos', [PromoController::class, 'index']);
+Route::get('/promos/{id}', [PromoController::class, 'show']);
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post(
+        '/promo/send-notification',
+        [PromoController::class, 'sendPromoNotification']
+    );
+});
+// =====================
+// FCM (ANDROID)
+// =====================
+// =====================
+// FCM (ANDROID)
+// =====================
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/fcm/token', [FcmController::class, 'storeToken']);
+    // Route::post('/fcm/send', [FcmController::class, 'send']); // aktifkan nanti
+});
 
-
-
-
-
+// Route::post('/fcm/test', function () {
+//     return response()->json([
+//         'status' => 'API FCM OK'
+//     ]);
+// });

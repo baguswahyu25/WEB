@@ -50,7 +50,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
-    
+    protected $casts = [
+    'notif_cs' => 'boolean',
+    'notif_promo' => 'boolean',
+    'notif_update' => 'boolean',
+];
+
 
     /**
      * The accessors to append to the model's array form.
@@ -82,6 +87,10 @@ public function getAvatarUrlFullAttribute()
 public function sendEmailVerificationNotification()
 {
     $this->notify(new VerifyEmailCustom);
+}
+public function fcmTokens()
+{
+    return $this->hasMany(FcmToken::class);
 }
 
 }

@@ -8,5 +8,10 @@ class CsChat extends Model
         'reply',
         'status'
     ];
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }
 

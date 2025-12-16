@@ -37,43 +37,32 @@ class AuthController extends Controller
     }
 
     // LOGIN
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
 
-        $user = User::where('email', $request->email)->first();
+    $user = \App\Models\User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Email atau password salah.'],
-            ]);
-        }
-
-        if (!$user->hasVerifiedEmail()) {
-            return response()->json([
-                'message' => 'Email belum diverifikasi. Silakan cek email Anda.',
-                'status' => false
-            ], 403);
-        }
-
-        if ($user->deleted_at != null) {
-            return response()->json(['message' => 'Akun telah dihapus'], 403);
-        }
-
-        $user->tokens()->delete();
-
-        $token = $user->createToken('mobile_token')->plainTextToken;
-
+    if (!$user || !\Hash::check($request->password, $user->password)) {
         return response()->json([
-            'message' => 'Login berhasil',
-            'status' => true,
-            'user' => $user,
-            'token' => $token,
-        ]);
+            'message' => 'Email atau password salah'
+        ], 401);
     }
+
+    // 🔑 INI YANG KAMU BELUM PUNYA
+    $token = $user->createToken('android')->plainTextToken;
+
+    return response()->json([
+        'message' => 'Login berhasil',
+        'status' => true,
+        'access_token' => $token,
+        'token_type' => 'Bearer',
+        'user' => $user
+    ]);
+}
 
     // GET USER PROFILE
     public function user(Request $request)
