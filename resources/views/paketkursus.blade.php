@@ -1,17 +1,17 @@
 <x-app-layout>
     <x-navbar />
 
-    <x-herosection />
+    <x-paker-kursus />
 
-    <x-paker-kursus>
-    </x-paker-kursus>
+    <x-instruktur />
 
-    <br>
-    <br>
+    <x-kontakkami />
+    <x-kirimpesan />
+
+    <x-lokasi />
 
 
     <x-footer>
     </x-footer>
-
 
 </x-app-layout>

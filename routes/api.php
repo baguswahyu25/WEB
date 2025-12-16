@@ -10,13 +10,8 @@ use App\Http\Controllers\Api\ForgotPasswordController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\FormPendaftaranController;
 use App\Http\Controllers\Api\ProfileController;
-<<<<<<< HEAD
-=======
 use App\Http\Controllers\BotController;
 
-
-
->>>>>>> f8e49739e5a8122807dcadd2c023d15651a33873
 
 
 Route::middleware('auth:sanctum')->group(function () {

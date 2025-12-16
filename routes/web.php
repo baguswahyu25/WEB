@@ -27,7 +27,7 @@ Route::get('/layanan', function () {
 });
 
 Route::get('/support', function () {
-    return view('suport');
+    return view('support');
 });
 
 Route::get('/daftar', function () {

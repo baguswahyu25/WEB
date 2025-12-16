@@ -1,4 +1,4 @@
-<section class="relative bg-white min-h-screen overflow-hidden pt-14">
+<section class="relative bg-white min-h-screen overflow-hidden ">
     {{-- CATATAN: Hapus h-[768px] dan py-16 dari <section> --}}
 
     {{-- Div ini menguasai seluruh ruang yang tersisa dan menggunakan Flexbox untuk sentralisasi vertikal --}}
