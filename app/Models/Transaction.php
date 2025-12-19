@@ -13,7 +13,8 @@ class Transaction extends Model
         'amount', 
         'payment_method', 
         'transaction_status',
-        'paid_at'
+        'paid_at',
+        'user_id'
     ];
     
     /**

@@ -3,12 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\Auth\CustomResetPasswordController;
-use App\Http\Controllers\WebPendaftaranController;
-
-Route::get('/bayar', [WebPendaftaranController::class, 'showForm'])->name('bayar.show');
-Route::post('/bayar/init', [WebPendaftaranController::class, 'initPayment'])->name('bayar.init');
-Route::post('/bayar/callback', [WebPendaftaranController::class, 'handleCallback'])->name('bayar.callback');
-
 
 
 Route::get('/', function () {
@@ -35,14 +29,25 @@ Route::get('/daftar', function () {
     return view('pembayaran');
 });
 
-// Dashboard protect
-Route::middleware([
-    'auth',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+// rute perantara (tetap sama)
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('user.dashboard');
+    })->name('dashboard');
+
+    // PERBAIKAN DI SINI: Tambahkan middleware 'is_user'
+    Route::get('/user/dashboard', function () {
+        return view('index'); 
+    })->name('user.dashboard')->middleware('is_user'); // <--- Tambahkan pagar ini
+});
+
+// 3. Rute Khusus Admin (File: resources/views/admin/dashboard.blade.php)
+Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard'); // Mengarah ke folder admin/dashboard
     })->name('dashboard');
 });
 

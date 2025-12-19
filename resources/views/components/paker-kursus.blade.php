@@ -31,10 +31,33 @@
                     <li>14 pertemuan</li>
                 </ul>
             </div>
-            <a href="{{ route('bayar.show', ['paket' => 'Manual', 'harga' => 2150000]) }}"
-                class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
-                Rp 2.150.000
-            </a>
+
+
+            @guest
+                <a href="/login"
+                    class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
+                    Rp 2.150.000
+                </a>
+            @endguest
+
+
+            @auth
+                <form action="{{ route('bayar.show') }}" method="POST" class="mt-auto">
+                    @csrf
+                    {{-- Data disembunyikan agar tidak muncul di URL --}}
+                    <input type="hidden" name="paket" value="Manual">
+                    <input type="hidden" name="harga" value="2150000">
+
+                    <button type="submit"
+                        class="mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block w-full">
+                        Rp 2.150.000
+                    </button>
+                </form>
+                {{-- <a href="{{ route('bayar.show', ['paket' => 'Manual', 'harga' => 2150000]) }}"
+                    class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
+                    Rp 2.150.000
+                </a> --}}
+            @endauth
         </div>
 
 
