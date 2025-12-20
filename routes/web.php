@@ -3,6 +3,34 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\Auth\CustomResetPasswordController;
+use App\Http\Controllers\BayarController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SnapPaymentController;
+
+
+/*
+|--------------------------------------------------------------------------
+| ROUTE USER (LOGIN)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    // 1. Dari card paket → form pendaftaran
+    Route::post('/bayar', 
+        [BayarController::class, 'show']
+    )->name('bayar.show');
+
+    // 2. Submit form pendaftaran → buat transaksi
+    Route::post('/payment', 
+        [PaymentController::class, 'store']
+    )->name('payment.store');
+
+    // 3. Redirect ke Midtrans Snap
+    Route::get('/payment/snap/{pendaftaran_id}', 
+        [SnapPaymentController::class, 'show']
+    )->name('payment.snap');
+});
+
 
 
 Route::get('/', function () {

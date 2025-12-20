@@ -14,6 +14,10 @@ use App\Http\Controllers\BotController;
 use App\Http\Controllers\Api\PromoController;
 use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\Api\FcmController;
+use App\Http\Controllers\MidtransNotificationController;
+
+Route::post('/midtrans/notification', [MidtransNotificationController::class, 'handle'])->name('midtrans.notification');
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
