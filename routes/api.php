@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\PromoController;
 use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\Api\FcmController;
 use App\Http\Controllers\MidtransNotificationController;
+use App\Http\Controllers\Api\SnapTokenController;
+
 
 Route::post('/midtrans/notification', [MidtransNotificationController::class, 'handle'])->name('midtrans.notification');
 
@@ -57,10 +59,12 @@ Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
         'user' => $request->user()
     ]);
 });
-Route::prefix('v1')->group(function () {
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/pendaftaran', [FormPendaftaranController::class, 'store']);
-    });
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+
+    Route::post('pendaftaran', [FormPendaftaranController::class, 'store']);
+
+    Route::post('payment/snap', [SnapTokenController::class, 'generate']);
+
 });
 
 Route::prefix('admin')->group(function () {
@@ -99,19 +103,9 @@ Route::middleware('auth:sanctum')->group(function () {
         [PromoController::class, 'sendPromoNotification']
     );
 });
-// =====================
-// FCM (ANDROID)
-// =====================
-// =====================
-// FCM (ANDROID)
-// =====================
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/fcm/token', [FcmController::class, 'storeToken']);
     // Route::post('/fcm/send', [FcmController::class, 'send']); // aktifkan nanti
 });
 
-// Route::post('/fcm/test', function () {
-//     return response()->json([
-//         'status' => 'API FCM OK'
-//     ]);
-// });

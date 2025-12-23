@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Pendaftaran;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
@@ -52,13 +53,23 @@ class PaymentController extends Controller
                 ? 'waiting_cash'
                 : 'pending';
 
-            // 3️⃣ Buat transaksi
-            $transaction = Transaction::create([
-                'pendaftaran_id'     => $pendaftaran->id,
-                'midtrans_order_id'  => 'ORDER-' . Str::uuid(),
-                'amount'             => $request->harga,
-                'transaction_status' => $status,
-            ]);
+            // 3️⃣ Buat transaksi dengan logging jika gagal
+            try {
+                $transaction = Transaction::create([
+                    'pendaftaran_id'     => $pendaftaran->id,
+                    'midtrans_order_id'  => 'ORDER-' . Str::uuid(),
+                    'amount'             => $request->harga,
+                    'transaction_status' => $status,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Transaction gagal dibuat', [
+                    'pendaftaran_id' => $pendaftaran->id,
+                    'error'          => $e->getMessage()
+                ]);
+
+                // throw agar DB rollBack
+                throw $e;
+            }
 
             DB::commit();
 
@@ -75,6 +86,11 @@ class PaymentController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
+            Log::error('Pendaftaran gagal', [
+                'user_id' => auth()->id(),
+                'error'   => $e->getMessage()
+            ]);
 
             return back()->withErrors([
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()

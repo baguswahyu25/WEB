@@ -20,20 +20,21 @@ class MidtransNotificationController extends Controller
         \Midtrans\Config::$isSanitized   = true;
         \Midtrans\Config::$is3ds         = true;
 
-        if ($request->header('Midtrans-Dummy-Test') === 'true') {
-    $orderId           = $request->input('order_id');
-    $transactionStatus = $request->input('transaction_status');
-    $paymentType       = $request->input('payment_type');
-} else {
-    $notif = new \Midtrans\Notification();
-    $orderId           = $notif->order_id;
-    $transactionStatus = $notif->transaction_status;
-    $paymentType       = $notif->payment_type ?? null;
-    $fraudStatus       = $notif->fraud_status ?? null;
-}
-
-
         try {
+            $serverKey = config('midtrans.server_key');
+
+            $expectedSignature = hash(
+                'sha512',
+                $request->order_id .
+                $request->status_code .
+                $request->gross_amount .
+                $serverKey
+            );
+
+            if ($request->signature_key !== $expectedSignature) {
+                Log::warning('Invalid Midtrans signature', $request->all());
+                return response()->json(['message' => 'Invalid signature'], 403);
+            }
             // ===============================
             // 2. Ambil notifikasi resmi Midtrans
             // ===============================
@@ -71,7 +72,7 @@ class MidtransNotificationController extends Controller
             } elseif (in_array($transactionStatus, ['cancel', 'expire', 'deny'])) {
                 $finalStatus = 'failed';
             }
-
+            
             // ===============================
             // 5. Update database (atomic)
             // ===============================
@@ -79,13 +80,15 @@ class MidtransNotificationController extends Controller
 
                 if ($transaction->transaction_status === $finalStatus) {
                     return; // Tidak update jika sama
-                }
-
-                $transaction->update([
+                }   
+                $updateData = [
                     'transaction_status' => $finalStatus,
-                    'payment_method'     => $paymentType,
-                    'paid_at'            => $finalStatus === 'paid' ? now() : null,
-                ]);
+                    'paid_at' => $finalStatus === 'paid' ? now() : null,
+                ];
+
+                if ($paymentType) $updateData['payment_method'] = $paymentType;
+
+                $transaction->update($updateData);
 
                 // ===============================
                 // 6. Efek ke PENDAFTARAN

@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use App\Models\Pendaftaran; // <--- ini wajib
+use App\Models\Transaction;  // <--- ini wajib
+use App\Services\MidtransService;
 use Exception;
 
 class FormPendaftaranController extends Controller
@@ -94,25 +97,30 @@ class FormPendaftaranController extends Controller
                 'updated_at'       => now(),
             ]);
 
-            DB::commit();
+            $pendaftaran = Pendaftaran::find($id);
 
-            return response()->json([
-                'success' => true,
-                'status'  => true,
-                'message' => 'Pendaftaran berhasil disimpan',
-                'id'      => $id
-            ]);
+    // 2. Buat transaksi Midtrans
+    $transaction = Transaction::create([
+        'pendaftaran_id' => $pendaftaran->id,
+        'midtrans_order_id' => 'REG-' . $pendaftaran->id . '-' . time(),
+        'transaction_status' => 'pending',
+        'amount' => $pendaftaran->harga,
+    ]);
 
-        } catch (Exception $e) {
+    DB::commit();
 
-            DB::rollBack();
-
-            return response()->json([
-                'success' => false,
-                'status'  => false,
-                'message' => 'Terjadi kesalahan server',
-                'error'   => $e->getMessage()
-            ], 500);
-        }
+    return response()->json([
+        'success' => true,
+        'pendaftaran_id' => $pendaftaran->id,
+        'transaction_id' => $transaction->id
+    ]);
+} catch (\Exception $e) {
+    DB::rollBack();
+    return response()->json([
+        'success' => false,
+        'message' => 'Terjadi kesalahan server',
+        'error' => $e->getMessage()
+    ], 500);
+}
     }
 }

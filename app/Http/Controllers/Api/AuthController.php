@@ -13,28 +13,32 @@ class AuthController extends Controller
 {
     // REGISTER
     public function register(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => Hash::make($validated['password']),
+    ]);
 
-        $user->sendEmailVerificationNotification();
+    $user->sendEmailVerificationNotification();
 
-        $token = $user->createToken('mobile_token')->plainTextToken;
+    $token = $user->createToken('mobile_token')->plainTextToken;
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 201);
-    }
+    return response()->json([
+        'success' => true,
+        'message' => 'Registrasi berhasil, silakan cek email untuk verifikasi',
+        'access_token' => $token,
+        'token_type' => 'Bearer',
+        'user' => $user,
+    ], 201);
+}
+
 
     // LOGIN
 public function login(Request $request)
