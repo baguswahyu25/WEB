@@ -16,6 +16,9 @@ use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\Api\FcmController;
 use App\Http\Controllers\MidtransNotificationController;
 use App\Http\Controllers\Api\SnapTokenController;
+use App\Http\Controllers\Api\PaymentStatusController;
+use App\Http\Controllers\Api\RiwayatPemesananController;
+use App\Http\Controllers\Api\PaketKursusController;
 
 
 Route::post('/midtrans/notification', [MidtransNotificationController::class, 'handle'])->name('midtrans.notification');
@@ -65,6 +68,9 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     Route::post('payment/snap', [SnapTokenController::class, 'generate']);
 
+    Route::get('/payment/status/{pendaftaranId}', [PaymentStatusController::class, 'check']);
+
+
 });
 
 Route::prefix('admin')->group(function () {
@@ -108,4 +114,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/fcm/token', [FcmController::class, 'storeToken']);
     // Route::post('/fcm/send', [FcmController::class, 'send']); // aktifkan nanti
 });
+
+Route::middleware('auth:sanctum')->get(
+    'v1/riwayat-pemesanan',
+    [RiwayatPemesananController::class, 'index']
+);
+
+Route::middleware('auth:sanctum')->get(
+    'v1/riwayat-pemesanan/{id}',
+    [RiwayatPemesananController::class, 'show']
+);
+
+Route::get('paket-kursus', [PaketKursusController::class, 'index']);
 
