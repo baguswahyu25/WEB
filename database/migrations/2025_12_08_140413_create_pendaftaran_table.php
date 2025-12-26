@@ -28,10 +28,6 @@ Schema::create('pendaftaran', function (Blueprint $table) {
     $table->string('metode_pembayaran');
     $table->string('opsi_kredit')->nullable();
 
-    // Upload file (khusus SIM)
-    $table->text('pas_foto_url')->nullable();
-    $table->text('ktp_url')->nullable();
-
     // ✔ Harga
     $table->integer('harga')->default(0);
 

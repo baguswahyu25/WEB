@@ -65,10 +65,16 @@ Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     Route::post('pendaftaran', [FormPendaftaranController::class, 'store']);
+    
+    Route::get('pendaftaran/{id}', [FormPendaftaranController::class, 'show']);
 
     Route::post('payment/snap', [SnapTokenController::class, 'generate']);
 
     Route::get('/payment/status/{pendaftaranId}', [PaymentStatusController::class, 'check']);
+    
+    // ✅ RIWAYAT PEMESANAN (PINDAHKAN KE SINI)
+    Route::get('riwayat-pemesanan', [RiwayatPemesananController::class, 'index']);
+    Route::get('riwayat-pemesanan/{id}', [RiwayatPemesananController::class, 'show']);
 
 
 });
@@ -115,15 +121,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('/fcm/send', [FcmController::class, 'send']); // aktifkan nanti
 });
 
-Route::middleware('auth:sanctum')->get(
-    'v1/riwayat-pemesanan',
-    [RiwayatPemesananController::class, 'index']
-);
-
-Route::middleware('auth:sanctum')->get(
-    'v1/riwayat-pemesanan/{id}',
-    [RiwayatPemesananController::class, 'show']
-);
 
 Route::get('paket-kursus', [PaketKursusController::class, 'index']);
 

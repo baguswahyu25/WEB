@@ -6,45 +6,32 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use App\Models\Pendaftaran; // <--- ini wajib
-use App\Models\Transaction;  // <--- ini wajib
-use App\Services\MidtransService;
+
+use App\Models\Pendaftaran;
+use App\Models\Transaction;
+use App\Models\PaketKursus; // ✅ WAJIB
 use Exception;
 
 class FormPendaftaranController extends Controller
 {
     public function store(Request $request)
     {
-        // VALIDASI DASAR
+        // ===============================
+        // 1. VALIDASI DASAR
+        // ===============================
         $rules = [
             'paket'             => 'required|string',
             'nama_lengkap'      => 'required|string',
-
             'tempat_lahir'      => 'required|string',
-            'tanggal_lahir' => 'required|date_format:Y-m-d',
-
+            'tanggal_lahir'     => 'required|date_format:Y-m-d',
             'alamat'            => 'required|string',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-
+            'jenis_kelamin'     => 'required|in:Laki-laki,Perempuan',
             'pekerjaan'         => 'required|string',
-            'mobil_dipilih'             => 'required|string',
-
+            'mobil_dipilih'     => 'required|string',
             'metode_pembayaran' => 'required|string',
             'opsi_kredit'       => 'nullable|string',
-
-            'harga'             => 'required|integer',
-
-            // menentukan sim / non sim
             'tipe_pendaftaran'  => 'required|in:sim,non_sim',
         ];
-
-        // Jika SIM → file wajib
-        if ($request->tipe_pendaftaran === 'sim') {
-            $rules['pas_foto'] = 'required|file|image|max:5120';
-            $rules['ktp']      = 'required|file|image|max:5120';
-        }
-
-        // Jalankan validasi
         try {
             $validated = $request->validate($rules);
         } catch (ValidationException $e) {
@@ -55,28 +42,33 @@ class FormPendaftaranController extends Controller
             ], 422);
         }
 
-        try {
+        // ===============================
+        // 2. AMBIL HARGA DARI DB
+        // ===============================
+$paket = PaketKursus::where('nama', $validated['paket'])->first();
 
+
+        if (!$paket) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Paket tidak ditemukan'
+            ], 404);
+        }
+
+        try {
             DB::beginTransaction();
 
-            // Upload file hanya SIM
-            $pasFotoPath = null;
-            $ktpPath     = null;
-
-            if ($validated['tipe_pendaftaran'] === 'sim') {
-                $pasFotoPath = $request->file('pas_foto')->store('pendaftaran/pas_foto', 'public');
-                $ktpPath     = $request->file('ktp')->store('pendaftaran/ktp', 'public');
-            }
-
-            // Insert data
-            $id = DB::table('pendaftaran')->insertGetId([
+            // ===============================
+            // 4. INSERT PENDAFTARAN
+            // ===============================
+            $pendaftaran = Pendaftaran::create([
                 'user_id'          => $request->user()->id ?? null,
-                'paket'            => $validated['paket'],
+                'paket'            => $paket->nama,
+                'harga'            => $paket->harga, // 🔥 FIX UTAMA
 
                 'nama_lengkap'     => $validated['nama_lengkap'],
                 'tempat_lahir'     => $validated['tempat_lahir'],
                 'tanggal_lahir'    => $validated['tanggal_lahir'],
-
                 'alamat'           => $validated['alamat'],
                 'jenis_kelamin'    => $validated['jenis_kelamin'],
                 'pekerjaan'        => $validated['pekerjaan'],
@@ -85,42 +77,57 @@ class FormPendaftaranController extends Controller
                 'metode_pembayaran'=> $validated['metode_pembayaran'],
                 'opsi_kredit'      => $validated['opsi_kredit'] ?? null,
 
-                'harga'            => $validated['harga'],
-
-                'pas_foto_url'     => $pasFotoPath,
-                'ktp_url'          => $ktpPath,
-
                 'tipe_pendaftaran' => $validated['tipe_pendaftaran'],
-
                 'tanggal_daftar'   => now(),
-                'created_at'       => now(),
-                'updated_at'       => now(),
             ]);
 
-            $pendaftaran = Pendaftaran::find($id);
+            // ===============================
+            // 5. BUAT TRANSAKSI MIDTRANS
+            // ===============================
+            $transaction = Transaction::create([
+                'pendaftaran_id'    => $pendaftaran->id,
+                'midtrans_order_id' => 'REG-' . $pendaftaran->id . '-' . time(),
+                'transaction_status'=> 'pending',
+                'amount'            => $pendaftaran->harga,
+            ]);
 
-    // 2. Buat transaksi Midtrans
-    $transaction = Transaction::create([
-        'pendaftaran_id' => $pendaftaran->id,
-        'midtrans_order_id' => 'REG-' . $pendaftaran->id . '-' . time(),
-        'transaction_status' => 'pending',
-        'amount' => $pendaftaran->harga,
-    ]);
+            DB::commit();
 
-    DB::commit();
+            return response()->json([
+                'success' => true,
+                'pendaftaran_id' => $pendaftaran->id,
+                'transaction_id' => $transaction->id
+            ]);
 
-    return response()->json([
-        'success' => true,
-        'pendaftaran_id' => $pendaftaran->id,
-        'transaction_id' => $transaction->id
-    ]);
-} catch (\Exception $e) {
-    DB::rollBack();
-    return response()->json([
-        'success' => false,
-        'message' => 'Terjadi kesalahan server',
-        'error' => $e->getMessage()
-    ], 500);
-}
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
+    public function show($id)
+{
+    $pendaftaran = Pendaftaran::where('id', $id)
+        ->where('user_id', auth()->id())
+        ->first();
+
+    if (!$pendaftaran) {
+        return response()->json([
+            'message' => 'Data pendaftaran tidak ditemukan'
+        ], 404);
+    }
+
+    return response()->json([
+        'paket_nama' => $pendaftaran->paket, // STRING
+        'total'     => $pendaftaran->harga,
+        'metode'    => $pendaftaran->metode_pembayaran,
+        'tanggal'   => $pendaftaran->created_at?->format('Y-m-d'),
+    ]);
+}
+
+
 }

@@ -15,7 +15,9 @@ class Transaction extends Model
         'transaction_status',
         'paid_at',
     ];
-
+    protected $casts = [
+        'paid_at' => 'datetime',
+    ];
     /**
      * Relasi: Satu Transaksi dimiliki oleh satu Pendaftaran
      */

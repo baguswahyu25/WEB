@@ -19,8 +19,6 @@ use App\Notifications\VerifyEmailCustom;
 class User extends Authenticatable implements MustVerifyEmail
 
 {
-    use HasApiTokens;
-
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens;
     use HasFactory;
@@ -88,9 +86,4 @@ public function sendEmailVerificationNotification()
 {
     $this->notify(new VerifyEmailCustom);
 }
-public function fcmTokens()
-{
-    return $this->hasMany(FcmToken::class);
-}
-
 }
