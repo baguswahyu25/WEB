@@ -60,18 +60,17 @@ class ProfileController extends Controller
     $user->save();
 
     return response()->json([
-        'success' => true,
-        'message' => 'Profil berhasil diperbarui',
-        'user' => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'email_verified_at' => $user->email_verified_at,
-            'profile_photo_url' => $user->profile_photo_path
-                ? asset('storage/' . $user->profile_photo_path)
-                : null,
-        ]
-    ]);
+    'user' => [
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'email_verified_at' => $user->email_verified_at,
+        'profile_photo_url' => $user->profile_photo_path
+            ? asset('storage/' . $user->profile_photo_path)
+            : null,
+    ]
+], 200);
+
 }
 
 }

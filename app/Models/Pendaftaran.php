@@ -14,7 +14,7 @@ class Pendaftaran extends Model
     protected $table = 'pendaftaran';
     
     // Wajib: Agar bisa menggunakan Mass Assignment (mengisi data melalui $model->create())
- protected $fillable = [
+protected $fillable = [
     'user_id',
     'nama_lengkap',
     'tempat_lahir',
@@ -26,8 +26,14 @@ class Pendaftaran extends Model
     'paket',
     'harga',
     'metode_pembayaran',
+    'opsi_kredit',
+    'tipe_pendaftaran',
     'tanggal_daftar',
+    'total_pertemuan',
+    'sisa_pertemuan',
+    'status_pendaftaran',
 ];
+
 
 
     // Relasi 1: User (Siapa yang mendaftar)
@@ -46,6 +52,11 @@ class Pendaftaran extends Model
     public function transaction()
     {
         // Parameter kedua adalah nama foreign key di tabel 'transactions'
-        return $this->hasOne(Transaction::class, 'pendaftaran_id'); 
+               return $this->hasOne(Transaction::class, 'pendaftaran_id');
     }
+        public function jadwalPertemuan()
+    {
+        return $this->hasMany(JadwalPertemuan::class);
+    }
+
 }

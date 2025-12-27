@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+public function up(): void
+{
+    Schema::create('jadwal_pertemuan', function (Blueprint $table) {
+        $table->id();
+
+        $table->unsignedBigInteger('pendaftaran_id');
+
+        $table->integer('pertemuan_ke');
+        $table->date('tanggal');
+        $table->time('jam');
+
+        // ⚠️ ENUM DI PG OK, TAPI FK JANGAN DIGABUNG
+        $table->string('status')->default('pending');
+
+        $table->timestamps();
+    });
+}
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jadwal_pertemuan');
+    }
+};

@@ -1,126 +1,140 @@
-<?php
+    <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\VerificationController;
-use App\Http\Controllers\Api\UserController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\Api\ForgotPasswordController;
-use Illuminate\Support\Facades\Password;
-use App\Http\Controllers\FormPendaftaranController;
-use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\BotController;
-use App\Http\Controllers\Api\PromoController;
-use App\Http\Controllers\DeviceTokenController;
-use App\Http\Controllers\Api\FcmController;
-use App\Http\Controllers\MidtransNotificationController;
-use App\Http\Controllers\Api\SnapTokenController;
-use App\Http\Controllers\Api\PaymentStatusController;
-use App\Http\Controllers\Api\RiwayatPemesananController;
-use App\Http\Controllers\Api\PaketKursusController;
-
-
-Route::post('/midtrans/notification', [MidtransNotificationController::class, 'handle'])->name('midtrans.notification');
+    use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Route;
+    use App\Http\Controllers\Api\AuthController;
+    use App\Http\Controllers\VerificationController;
+    use App\Http\Controllers\Api\UserController;
+    use Illuminate\Foundation\Auth\EmailVerificationRequest;
+    use App\Http\Controllers\Api\ForgotPasswordController;
+    use Illuminate\Support\Facades\Password;
+    use App\Http\Controllers\FormPendaftaranController;
+    use App\Http\Controllers\Api\ProfileController;
+    use App\Http\Controllers\BotController;
+    use App\Http\Controllers\Api\PromoController;
+    use App\Http\Controllers\DeviceTokenController;
+    use App\Http\Controllers\Api\FcmController;
+    use App\Http\Controllers\MidtransNotificationController;
+    use App\Http\Controllers\Api\SnapTokenController;
+    use App\Http\Controllers\Api\PaymentStatusController;
+    use App\Http\Controllers\Api\RiwayatPemesananController;
+    use App\Http\Controllers\Api\PaketKursusController;
+    use App\Http\Controllers\Api\JadwalPertemuanController;
 
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', [AuthController::class, 'user']);
-    Route::post('/user/update', [ProfileController::class, 'updateProfile']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/email/resend', [VerificationController::class, 'resend'])
-        ->name('api.verification.resend');
+    Route::post('/midtrans/notification', [MidtransNotificationController::class, 'handle'])->name('midtrans.notification');
+
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/user', [AuthController::class, 'user']);
+        Route::post('/user/update', [ProfileController::class, 'updateProfile']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/email/resend', [VerificationController::class, 'resend'])
+            ->name('api.verification.resend');
+            
+    });
+
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    // ================================
+    // FORGOT PASSWORD (KIRIM LINK)
+    // ================================
+    Route::post('/forgot-password', function (Request $request) {
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => __($status)], 200)
+            : response()->json(['message' => __($status)], 400);
+    });
+
+    // =======================================
+    // RESET PASSWORD (USER KLIK LINK EMAIL)
+    // =======================================
+    Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'])
+        ->name('api.password.reset');
+
+    Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
+        return response()->json([
+            'success' => true,
+            'user' => $request->user()
+        ]);
+    });
+    Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+        Route::get('pendaftaran/aktif', [FormPendaftaranController::class, 'aktif']);
+
+        Route::post('pendaftaran', [FormPendaftaranController::class, 'store']);
         
-});
+        Route::get('pendaftaran/{id}', [FormPendaftaranController::class, 'show']);
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-// ================================
-// FORGOT PASSWORD (KIRIM LINK)
-// ================================
-Route::post('/forgot-password', function (Request $request) {
-    $request->validate(['email' => 'required|email']);
+        Route::post('payment/snap', [SnapTokenController::class, 'generate']);
 
-    $status = Password::sendResetLink(
-        $request->only('email')
-    );
+        Route::get('/payment/status/{pendaftaranId}', [PaymentStatusController::class, 'check']);
+        
+        // ✅ RIWAYAT PEMESANAN (PINDAHKAN KE SINI)
+        Route::get('riwayat-pemesanan', [RiwayatPemesananController::class, 'index']);
+        Route::get('riwayat-pemesanan/{id}', [RiwayatPemesananController::class, 'show']);
+            // ===== JADWAL =====
+        Route::post('jadwal', [JadwalPertemuanController::class, 'store']);
+    Route::get('jadwal-pertemuan/jam-dipakai', [JadwalPertemuanController::class, 'jamDipakai']);
 
-    return $status === Password::RESET_LINK_SENT
-        ? response()->json(['message' => __($status)], 200)
-        : response()->json(['message' => __($status)], 400);
-});
+    Route::get('jadwal-pertemuan/{pendaftaran_id}', [JadwalPertemuanController::class, 'index'])
+        ->whereNumber('pendaftaran_id'); // hanya menerima angka
 
-// =======================================
-// RESET PASSWORD (USER KLIK LINK EMAIL)
-// =======================================
-Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'])
-    ->name('api.password.reset');
-
-Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
-    return response()->json([
-        'success' => true,
-        'user' => $request->user()
-    ]);
-});
-Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
-
-    Route::post('pendaftaran', [FormPendaftaranController::class, 'store']);
-    
-    Route::get('pendaftaran/{id}', [FormPendaftaranController::class, 'show']);
-
-    Route::post('payment/snap', [SnapTokenController::class, 'generate']);
-
-    Route::get('/payment/status/{pendaftaranId}', [PaymentStatusController::class, 'check']);
-    
-    // ✅ RIWAYAT PEMESANAN (PINDAHKAN KE SINI)
-    Route::get('riwayat-pemesanan', [RiwayatPemesananController::class, 'index']);
-    Route::get('riwayat-pemesanan/{id}', [RiwayatPemesananController::class, 'show']);
+        Route::post(
+            'jadwal-pertemuan/{id}/selesai',
+            [JadwalPertemuanController::class, 'selesai']
+        );
 
 
-});
 
-Route::prefix('admin')->group(function () {
-    Route::get('/faq', [FaqController::class, 'index']);
-    Route::post('/faq', [FaqController::class, 'store']);
-    Route::put('/faq/{id}', [FaqController::class, 'update']);
-    Route::delete('/faq/{id}', [FaqController::class, 'destroy']);
-});
-/**
- * ===========================
- * BOT CHAT (USER)
- * ===========================
- */
-Route::middleware(['auth:sanctum', 'throttle:30,1'])
-    ->post('/bot/chat', [BotController::class, 'chat']);
+    });
 
-/**
- * ===========================
- * BOT CS (KHUSUS CS)
- * ===========================
- */
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/cs/waiting-chats', [BotController::class, 'waitingChats']);
-    Route::post('/cs/reply/{id}', [BotController::class, 'reply']);
-});
-Route::post('/user/change-password', [UserController::class, 'changePassword'])
-    ->middleware('auth:sanctum');
-Route::post('/user/notification-preference', [UserController::class, 'updateNotificationPreference'])
-    ->middleware('auth:sanctum');
-Route::get('/promos', [PromoController::class, 'index']);
-Route::get('/promos/{id}', [PromoController::class, 'show']);
+    Route::prefix('admin')->group(function () {
+        Route::get('/faq', [FaqController::class, 'index']);
+        Route::post('/faq', [FaqController::class, 'store']);
+        Route::put('/faq/{id}', [FaqController::class, 'update']);
+        Route::delete('/faq/{id}', [FaqController::class, 'destroy']);
+    });
+    /**
+     * ===========================
+     * BOT CHAT (USER)
+     * ===========================
+     */
+    Route::middleware(['auth:sanctum', 'throttle:30,1'])
+        ->post('/bot/chat', [BotController::class, 'chat']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post(
-        '/promo/send-notification',
-        [PromoController::class, 'sendPromoNotification']
-    );
-});
+    /**
+     * ===========================
+     * BOT CS (KHUSUS CS)
+     * ===========================
+     */
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/cs/waiting-chats', [BotController::class, 'waitingChats']);
+        Route::post('/cs/reply/{id}', [BotController::class, 'reply']);
+    });
+    Route::post('/user/change-password', [UserController::class, 'changePassword'])
+        ->middleware('auth:sanctum');
+    Route::post('/user/notification-preference', [UserController::class, 'updateNotificationPreference'])
+        ->middleware('auth:sanctum');
+    Route::get('/promos', [PromoController::class, 'index']);
+    Route::get('/promos/{id}', [PromoController::class, 'show']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/fcm/token', [FcmController::class, 'storeToken']);
-    // Route::post('/fcm/send', [FcmController::class, 'send']); // aktifkan nanti
-});
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post(
+            '/promo/send-notification',
+            [PromoController::class, 'sendPromoNotification']
+        );
+    });
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/fcm/token', [FcmController::class, 'storeToken']);
+        // Route::post('/fcm/send', [FcmController::class, 'send']); // aktifkan nanti
+    });
 
 
-Route::get('paket-kursus', [PaketKursusController::class, 'index']);
+    Route::get('paket-kursus', [PaketKursusController::class, 'index']);
 

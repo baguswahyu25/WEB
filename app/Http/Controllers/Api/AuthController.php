@@ -69,7 +69,8 @@ public function login(Request $request)
 }
 
     // GET USER PROFILE
-    public function user(Request $request)
+// GET USER PROFILE (Ringkas, tanpa accessor)
+public function user(Request $request)
 {
     $user = $request->user();
 
@@ -85,7 +86,8 @@ public function login(Request $request)
         'name' => $user->name,
         'email' => $user->email,
         'email_verified_at' => $user->email_verified_at,
-        'profile_photo_url' => $user->profile_photo_url, // Jetstream built-in
+        // langsung ambil dari database, tanpa accessor
+        'profile_photo_url' => $user->profile_photo_url ?? null,
     ]);
 }
 

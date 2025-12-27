@@ -64,7 +64,11 @@ $paket = PaketKursus::where('nama', $validated['paket'])->first();
             $pendaftaran = Pendaftaran::create([
                 'user_id'          => $request->user()->id ?? null,
                 'paket'            => $paket->nama,
-                'harga'            => $paket->harga, // 🔥 FIX UTAMA
+                'harga'            => $paket->harga,
+
+                // 🔥 INI PENTING   
+                'total_pertemuan'  => $paket->total_pertemuan,
+                'sisa_pertemuan'   => $paket->total_pertemuan,
 
                 'nama_lengkap'     => $validated['nama_lengkap'],
                 'tempat_lahir'     => $validated['tempat_lahir'],
@@ -80,6 +84,7 @@ $paket = PaketKursus::where('nama', $validated['paket'])->first();
                 'tipe_pendaftaran' => $validated['tipe_pendaftaran'],
                 'tanggal_daftar'   => now(),
             ]);
+
 
             // ===============================
             // 5. BUAT TRANSAKSI MIDTRANS
@@ -126,6 +131,31 @@ $paket = PaketKursus::where('nama', $validated['paket'])->first();
         'total'     => $pendaftaran->harga,
         'metode'    => $pendaftaran->metode_pembayaran,
         'tanggal'   => $pendaftaran->created_at?->format('Y-m-d'),
+    ]);
+}
+public function aktif(Request $request)
+{
+    $pendaftaran = Pendaftaran::with('transaction')
+        ->where('user_id', $request->user()->id)
+        ->where('status_pendaftaran', 'aktif')
+        ->latest()
+        ->first();
+
+    if (!$pendaftaran) {
+        return response()->json([
+            'message' => 'Tidak ada pendaftaran aktif'
+        ], 404);
+    }
+
+    return response()->json([
+        'id' => $pendaftaran->id,
+        'status_pendaftaran' => $pendaftaran->status_pendaftaran,
+        'total_pertemuan' => $pendaftaran->total_pertemuan,
+        'sisa_pertemuan' => $pendaftaran->sisa_pertemuan,
+        'transaction' => $pendaftaran->transaction ? [
+            'transaction_status' => $pendaftaran->transaction->transaction_status,
+            'amount' => $pendaftaran->transaction->amount
+        ] : null
     ]);
 }
 
