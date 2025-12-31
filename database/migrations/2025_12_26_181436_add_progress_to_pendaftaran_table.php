@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
 {
     Schema::table('pendaftaran', function (Blueprint $table) {
-        $table->integer('total_pertemuan')->after('paket_kursus_id');
+        $table->integer('total_pertemuan')->after('paket');
         $table->integer('sisa_pertemuan')->after('total_pertemuan');
         $table->enum('status_pendaftaran', ['aktif','selesai','dibatalkan'])
               ->default('aktif');

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Security-Policy"
-        content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.sandbox.midtrans.com;">ss
+        content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.sandbox.midtrans.com;">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -28,13 +28,18 @@
         /* BAGIAN CSS: STYLING KURSOR BIRU */
         /* ======================================================= */
 
+
+
         body {
             cursor: none;
-            /* Latar belakang putih agar efek biru terlihat kontras */
             background-color: #ffffff;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden;
+            /* Pastikan margin benar-benar nol */
+            padding: 0;
+            /* Pastikan padding benar-benar nol */
+            overflow-x: hidden;
+            /* Mencegah scroll horizontal */
         }
 
         #cursor-trail {
@@ -43,6 +48,16 @@
             left: 0;
             pointer-events: none;
             z-index: 9999;
+
+            /* TAMBAHKAN INI */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #scroll-progress {
+            /* ... kode lainnya ... */
+            /* TAMBAHKAN INI */
+            display: none;
         }
 
         .trail-element {
@@ -79,9 +94,95 @@
             }
         }
     </style>
+
+
+    <style>
+        .loader {
+            width: 60px;
+            height: 32px;
+            --_g: no-repeat radial-gradient(farthest-side, #02104A 94%, #0000);
+            background:
+                var(--_g) 50% 0,
+                var(--_g) 100% 0;
+            background-size: 14px 14px;
+            position: relative;
+            animation: l23-0 1.5s linear infinite;
+        }
+
+        .loader:before {
+            content: "";
+            position: absolute;
+            height: 14px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: #02104A;
+            left: 0;
+            top: 0;
+            animation:
+                l23-1 1.5s linear infinite,
+                l23-2 0.5s cubic-bezier(0, 200, .8, 200) infinite;
+        }
+
+        @keyframes l23-0 {
+
+            0%,
+            31% {
+                background-position: 50% 0, 100% 0
+            }
+
+            33% {
+                background-position: 50% 100%, 100% 0
+            }
+
+            43%,
+            64% {
+                background-position: 50% 0, 100% 0
+            }
+
+            66% {
+                background-position: 50% 0, 100% 100%
+            }
+
+            79% {
+                background-position: 50% 0, 100% 0
+            }
+
+            100% {
+                transform: translateX(calc(-100%/3))
+            }
+        }
+
+        @keyframes l23-1 {
+            100% {
+                left: calc(100% + 7px)
+            }
+        }
+
+        @keyframes l23-2 {
+            100% {
+                top: -0.1px
+            }
+        }
+    </style>
+
 </head>
 
 <body class="font-sans antialiased">
+
+    <div id="preloader"
+        class="fixed inset-0 z-[9999] flex items-center justify-center 
+            bg-white opacity-100 transition-opacity duration-700">
+
+        <div class="flex flex-col items-center">
+
+            {{-- <img src="{{ asset('img/logo.png') }}" alt="Drive Nusa Loading"
+                class="h-[130px] w-auto mb-6 object-contain" /> --}}
+
+            <div class="loader"></div>
+
+            {{-- <p class="mt-6 text-sm text-gray-600">Sedang mempersiapkan...</p> --}}
+        </div>
+    </div>
 
     <div class="min-h-screen">
 
@@ -89,7 +190,9 @@
 
         {{-- 4. Main Content --}}
         {{-- Menggunakan pt-[64px] (tinggi h-16) untuk mengimbangi navbar fixed --}}
-        <main class="pt-16">
+        {{-- Jika rute saat ini mengandung kata 'profile' atau 'user', jangan pakai pt-16 --}}
+        {{-- Tetapkan pt-16 secara default, kecuali benar-benar di halaman Profile Dashboard --}}
+        <main class="{{ Request::is('user/profile', 'profile/*') ? '' : 'pt-16' }}">
             {{ $slot }}
         </main>
 
@@ -97,12 +200,16 @@
 
     @stack('modals')
 
-    {{-- 1. SCROLL PROGRESS BAR --}}
-    {{-- top-[64px] disinkronkan dengan tinggi navbar h-16 --}}
-    <div id="scroll-progress" class="fixed top-[64px] left-0 h-1 bg-[#0928a4] z-[9999] w-0 transition-all duration-250">
-    </div>
+    {{-- Tampilkan progress bar HANYA JIKA rute saat ini BUKAN profile atau user --}}
+    @if (!Request::is('profile*') && !Request::is('user*'))
+        <div id="scroll-progress"
+            class="fixed top-[64px] left-0 h-1 bg-[#0928a4] z-[9999] w-0 transition-all duration-250">
+        </div>
+    @endif
+
     <div id="cursor-trail"></div>
 
+    {{-- scroll bar --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // =========================================================
@@ -195,6 +302,7 @@
         });
     </script>
 
+    {{-- kursor --}}
     <script>
         // =======================================================
         // BAGIAN JAVASCRIPT: LOGIKA JEJAK KURSSOR WARNA-WARNI + KLIK
@@ -335,6 +443,58 @@
             animateTrail();
         }
     </script>
+
+    <script>
+        // Durasi Transisi CSS (700ms dari Tailwind 'duration-700')
+        const FADE_OUT_DURATION = 700;
+
+        // Delay Tambahan untuk melihat animasi (3000ms = 3 detik)
+        const ADDITIONAL_DELAY = 0;
+
+        // Kunci scroll segera setelah script berjalan
+        document.body.style.overflow = 'hidden';
+
+        function hidePreloader() {
+            const preloader = document.getElementById('preloader');
+            const cursor = document.getElementById('cursor-trail');
+            const progressBar = document.getElementById('scroll-progress');
+
+            if (preloader) {
+                preloader.classList.add('opacity-0');
+
+                setTimeout(() => {
+                    preloader.classList.add('hidden');
+                    preloader.remove();
+
+                    // 1. Tampilkan Cursor Trail secara halus
+                    if (cursor) cursor.style.opacity = "1";
+
+                    // 2. Tampilkan Progress Bar
+                    if (progressBar) progressBar.style.display = "block";
+
+                    // 3. Kembalikan scroll ke normal
+                    document.body.style.overflow = 'auto';
+
+                }, FADE_OUT_DURATION);
+            }
+        }
+
+        // Tunggu sampai semua aset halaman selesai dimuat (window.load)
+        window.addEventListener('load', function() {
+            // Gabungkan ADDITIONAL_DELAY dengan FADE_OUT_DURATION
+            // Ini memastikan total durasi animasi yang terlihat
+            setTimeout(hidePreloader, ADDITIONAL_DELAY);
+        });
+
+        window.addEventListener('scroll', function() {
+            const scrollProgress = document.getElementById('scroll-progress');
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            scrollProgress.style.width = scrollPercent + '%';
+        });
+    </script>
+
 
     @livewireScripts
 </body>

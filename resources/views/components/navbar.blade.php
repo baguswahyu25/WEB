@@ -64,9 +64,11 @@
                         <button id="profile-dropdown-button" type="button"
                             class="flex items-center text-gray-900 hover:text-blue-600 focus:outline-none transition duration-150 transform hover:-translate-y-0.5 py-2">
 
-                            {{-- Menggunakan Nama atau Avatar --}}
-                            <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ asset('img/N.png') }}"
+                            {{-- MODIFIKASI DISINI: Ambil foto dari storage jika ada, jika tidak pakai default --}}
+                            <img class="h-8 w-8 rounded-full object-cover mr-2"
+                                src="{{ Auth::user()->profile_photo_path ? asset('storage/' . Auth::user()->profile_photo_path) : asset('img/default-avatar.png') }}"
                                 alt="{{ Auth::user()->name }}">
+
                             <span class="text-sm font-medium hidden lg:inline">{{ Auth::user()->name ?? 'Pengguna' }}</span>
 
                             {{-- Chevron Down Icon --}}
@@ -76,14 +78,15 @@
                             </svg>
                         </button>
 
-                        {{-- Dropdown Menu (KONTEN) --}}
+                        {{-- Dropdown Menu --}}
                         <div id="profile-dropdown-menu"
-                            class="absolute right-0 mt-2 w-64 rounded-md shadow-2xl py-0 z-50 hidden 
-                    overflow-hidden border border-gray-700">
+                            class="absolute right-0 mt-2 w-64 rounded-md shadow-2xl py-0 z-50 hidden overflow-hidden border border-gray-700">
 
                             {{-- A. HEADER PROFIL --}}
                             <div class="flex items-center p-4 border-b border-gray-700 bg-[#ffb144]">
-                                <img class="h-10 w-10 rounded-full object-cover mr-3" src="{{ asset('img/N.png') }}"
+                                {{-- MODIFIKASI DISINI JUGA --}}
+                                <img class="h-10 w-10 rounded-full object-cover mr-3"
+                                    src="{{ Auth::user()->profile_photo_path ? asset('storage/' . Auth::user()->profile_photo_path) : asset('img/default-avatar.png') }}"
                                     alt="{{ Auth::user()->name }}">
 
                                 <div>
@@ -93,34 +96,17 @@
                                 </div>
                             </div>
 
-                            {{-- B. LIST MENU --}}
+                            {{-- B. LIST MENU & C. FOOTER tetap sama seperti kode Anda --}}
                             <div class="py-2 bg-white">
                                 <a href="{{ route('profile.show') }}"
-                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
-                                    My Profile
-                                </a>
-                                <a href="/settings"
-                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
-                                    Settings
-                                </a>
-                                <a href="/billing"
-                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
-                                    Billing
-                                </a>
-                                <a href="/faqs"
-                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
-                                    FAQs
-                                </a>
+                                    class="block px-4 py-3 text-sm text-gray-800 hover:bg-gray-100">My Profile</a>
                             </div>
 
-                            {{-- C. FOOTER (Logout) --}}
                             <div class="border-t border-gray-200 bg-white">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="block w-full text-left px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition duration-100">
-                                        Logout
-                                    </button>
+                                        class="block w-full text-left px-4 py-3 text-sm text-gray-800 hover:bg-gray-100">Logout</button>
                                 </form>
                             </div>
                         </div>

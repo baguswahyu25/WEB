@@ -1,15 +1,11 @@
-<section class="relative bg-white min-h-screen overflow-hidden ">
-    {{-- CATATAN: Hapus h-[768px] dan py-16 dari <section> --}}
+<section class="relative bg-white h-[450px] overflow-hidden">
+    {{-- Container Flex Utama --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-screen flex items-center">
 
-    {{-- Div ini menguasai seluruh ruang yang tersisa dan menggunakan Flexbox untuk sentralisasi vertikal --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-12 w-full py-16 -mt-20 md:-mt-32">
 
-        {{-- Kontainer Flex Utama: Hapus mt-96px yang tidak perlu --}}
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-12 w-full py-16">
-
-            {{-- Kiri: Konten Teks dan Tombol --}}
+            {{-- Kiri: Konten Teks --}}
             <div class="lg:w-1/2 text-center lg:text-left z-20">
-
                 <p class="text-xl text-blue-600 font-semibold mb-3">Hallo, selamat datang di</p>
 
                 <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
@@ -33,29 +29,25 @@
                             Login
                         </a>
                     </div>
-                </div>
-            @endguest
+                @endguest
 
-            @auth
-                <div class="flex justify-center lg:justify-start space-x-4">
-                    <a href="{{ route('register') }}"
-                        class="bg-white hover:bg-white text-white  py-3 px-8 rounded-lg  transition duration-300">
-                        Daftar
-                    </a>
-                    <a href="/login"
-                        class="bg-white hover:bg-white text-white  py-3 px-8 rounded-lg  transition duration-300">
-                        Login
-                    </a>
-                </div>
+                @auth
+                    {{-- Kosongkan jika tidak ingin tombol muncul setelah login, 
+                         atau ganti dengan link Dashboard --}}
+                    <div class="flex justify-center lg:justify-start space-x-4">
+                        <a href="/dashboard" class="text-blue-600 font-semibold hover:underline">
+                            Lanjutkan ke Dashboard →
+                        </a>
+                    </div>
+                @endauth
+            </div> {{-- <-- TAG PENUTUP DIV KONTEN TEKS HARUS DI LUAR @auth/@guest --}}
+
+            {{-- Kanan: Gambar --}}
+            <div class="lg:w-1/2 flex justify-center mt-12 lg:mt-0 relative z-10">
+                <img src="{{ asset('img/heroik.png') }}" alt="Hero Image"
+                    class="w-full max-w-lg h-auto object-contain" />
             </div>
-        @endauth
 
-        {{-- Kanan: Gambar Ilustrasi Mobil dan Orang --}}
-        <div class="lg:w-1/2 flex justify-center mt-12 lg:mt-0 relative z-10">
-            <img src="{{ asset('img/heroik.png') }}" alt="Kursus Mengemudi Dhuha Group dengan Mobil dan Instruktur"
-                class="w-full max-w-lg h-auto object-contain" />
-        </div>
-
-    </div>
-    </div>
+        </div> {{-- <-- Penutup Kontainer Flex Utama --}}
+    </div> {{-- <-- Penutup Max-w-7xl --}}
 </section>

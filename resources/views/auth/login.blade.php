@@ -1,31 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
+<x-app-layout>
+    <x-nafbar />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - DriveNusa</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/png" href="{{ asset('img/ico.png') }}">
-
-    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="../asset/logo.png">
-</head>
-
-<body class="min-h-screen bg-gradient-to-b from-white to-[#02104A] flex flex-col justify-between">
-
-    <x-nafbar>
-    </x-nafbar>
-
-    <br>
-    <br>
-
-    <!-- Form Login -->
-    <br>
-    <br>
-
-
-    <main class="flex flex-col items-center justify-center flex-grow px-4 py-10 ">
+    <main
+        class="flex flex-col items-center justify-center flex-grow px-4 py-10 bg-gradient-to-b from-white to-[#3c4d91] ">
         <!-- Logo -->
         <div class="absolute top-[75px] left-5 flex items-center gap-2">
             <img src="{{ asset('img/logo2.png') }}" alt="Logo" class="h-[125px] w-auto">
@@ -128,11 +105,7 @@
             </form>
         </div>
     </main>
+    <x-footer>
+    </x-footer>
 
-    <x-footer></x-footer>
-
-
-
-</body>
-
-</html>
+</x-app-layout>

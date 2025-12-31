@@ -32,6 +32,27 @@ Route::middleware('auth')->group(function () {
 });
 
 
+/*
+|--------------------------------------------------------------------------
+| ROUTE Profile
+|--------------------------------------------------------------------------
+*/
+
+    Route::get('/profile/keamanan', function () {
+        return view('profile.keamanan'); 
+    })->name('profile.keamanan');
+
+     Route::get('/profile/notifications', function () {
+        return view('profile.notifications'); 
+    })->name('profile.notifications');
+
+
+
+    /*
+|--------------------------------------------------------------------------
+| ROUTE USER (LOGIN)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('index');
