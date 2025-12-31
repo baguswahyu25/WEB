@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('transaction_token')->nullable(); // Token dari Midtrans (jika perlu)
 
             // Status
-            $table->enum('transaction_status', ['pending', 'paid', 'failed', 'expire', 'settlement', 'cancel'])->default('pending');
+            $table->enum('transaction_status', ['pending','paid','failed','expire','cancel'])->default('pending');
             $table->timestamp('paid_at')->nullable(); // Waktu pembayaran sukses
             
             $table->timestamps();

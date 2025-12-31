@@ -12,4 +12,11 @@ class Promo extends Model
         'expired_at',
         'is_active'
     ];
+public function getImageUrlAttribute($value)
+{
+    return $value
+        ? asset('storage/' . ltrim($value, '/'))
+        : null;
+}
+
 }

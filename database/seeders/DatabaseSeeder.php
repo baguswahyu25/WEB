@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PaketKursusSeeder::class,
             FaqSeeder::class,
+            PromoSeeder::class,
         ]);
     }
 }

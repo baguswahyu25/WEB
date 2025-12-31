@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Pendaftaran;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class RiwayatPemesananController extends Controller
 {
@@ -15,11 +17,7 @@ public function index(Request $request)
 
     $data = Pendaftaran::with('transaction')
         ->where('user_id', $user->id)
-        ->whereHas('transaction', function ($q) {
-            $q->whereIn('transaction_status', [
-                'pending','paid','failed','expire','settlement','cancel'
-            ]);
-        })
+
         ->orderByDesc('created_at')
         ->get()
         ->map(function ($p) {
@@ -34,19 +32,37 @@ public function index(Request $request)
                 default => asset('storage/default.jpg'),
             };
 
+            // STATUS AMAN
+            $status = $p->status_pembayaran ?? 'UNPAID';
+            switch ($status) {
+                case 'belum_bayar':
+                    $label = 'Belum Bayar';
+                    break;
+                case 'dp':
+                    $label = 'DP Terbayar';
+                    break;
+                case 'cicilan':
+                    $label = 'Dalam Cicilan';
+                    break;
+                case 'lunas':
+                    $label = 'Lunas';
+                    break;
+            }
+
+
+
             return [
                 'id' => $p->id,
                 'judul' => 'Kursus Mengemudi',
                 'paket' => $p->paket,
                 'harga' => (int) ($trx?->amount ?? 0),
-                'tanggal' => $trx?->paid_at instanceof \Carbon\Carbon
+                'tanggal' => $trx?->paid_at
                     ? $trx->paid_at->format('d-m-Y H:i')
                     : $p->created_at->format('d-m-Y H:i'),
                 'image' => $image,
-                'status' => $trx->transaction_status === 'settlement'
-    ? 'PAID'
-    : strtoupper($trx->transaction_status),
+                'status' => $status,
             ];
+
         });
 
     return response()->json($data);
@@ -62,18 +78,26 @@ public function show(Request $request, $id)
 
     $trx = $pendaftaran->transaction;
 
+    $status = match ($trx?->transaction_status) {
+        'settlement' => 'PAID',
+        'pending' => 'PENDING',
+        'expire' => 'EXPIRED',
+        'cancel' => 'CANCEL',
+        'failed' => 'FAILED',
+        default => 'UNPAID',
+    };
+
     return response()->json([
         'id' => $pendaftaran->id,
         'judul' => 'Kursus Mengemudi',
         'paket' => $pendaftaran->paket,
-        'harga' => $trx?->amount ?? 0,
-        'tanggal' => optional($trx?->paid_at)->format('d-m-Y H:i'),
-        'status' => $trx->transaction_status === 'settlement'
-    ? 'PAID'
-    : strtoupper($trx->transaction_status),
+        'harga' => (int) ($trx?->amount ?? 0),
+        'tanggal' => $trx?->paid_at?->format('d-m-Y H:i'),
+        'status' => $status,
         'order_id' => $trx?->midtrans_order_id,
-        'metode_pembayaran' => $trx?->payment_method,
-        'payment_status' => strtoupper($trx?->transaction_status),
+        'metode_pembayaran' => $trx?->payment_method ?? '-',
+        'payment_status' => $status,
     ]);
 }
+
 }

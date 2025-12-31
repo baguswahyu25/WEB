@@ -13,59 +13,50 @@ class SnapTokenController extends Controller
    public function generate(Request $request)
 {
     $request->validate([
-        'pendaftaran_id' => 'required|integer',
-        'metode' => 'required|string'
+        'transaction_id' => 'required|exists:transactions,id',
+        'metode' => 'required|in:transfer_bank,kredit',
     ]);
+$transaction = Transaction::with('pendaftaran')
+    ->findOrFail($request->transaction_id);
 
-    $transaction = Transaction::where(
-        'pendaftaran_id',
-        $request->pendaftaran_id
-    )->firstOrFail();
+if ($transaction->transaction_status !== 'pending') {
+    abort(403, 'Transaksi tidak valid');
+}
+    // ✅ KONFIGURASI MIDTRANS
 
     Config::$serverKey = config('midtrans.server_key');
     Config::$isProduction = config('midtrans.is_production');
     Config::$isSanitized = true;
-    Config::$is3ds = true;
+    Config::$is3ds = false;
 
-    $enabledPayments = [];
+    // ✅ MIDTRANS HANYA ALAT BAYAR
+    $enabledPayments = ['bank_transfer', 'qris'];
 
-    switch ($request->metode) {
-        case 'transfer_bank':
-            $enabledPayments = ['bank_transfer'];
-            break;
-
-        case 'kredit':
-            $enabledPayments = ['credit_card'];
-            break;
-
-        default:
-            return response()->json([
-                'message' => 'Metode tidak valid'
-            ], 400);
-    }
-
-    $snapToken = Snap::getSnapToken([
+    $params = [
         'transaction_details' => [
             'order_id' => $transaction->midtrans_order_id,
             'gross_amount' => (int) $transaction->amount,
         ],
         'customer_details' => [
-            'first_name' => $transaction->pendaftaran->nama_lengkap ?? 'User',
-            'email' => $transaction->pendaftaran->email ?? 'user@example.com',
+            'first_name' => preg_replace('/[^a-zA-Z ]/', '', $transaction->pendaftaran->nama_lengkap),
+            'email' => 'user'.$transaction->pendaftaran_id.'@example.com',
         ],
         'enabled_payments' => $enabledPayments,
-    ]);
+    ];
+
+    $snapToken = Snap::getSnapToken($params);
 
     $transaction->update([
         'transaction_token' => $snapToken,
-        'payment_method' => $request->metode,
+        'payment_method' => $request->metode, // transfer_bank / kredit
     ]);
 
     return response()->json([
         'snap_token' => $snapToken,
         'order_id' => $transaction->midtrans_order_id,
-        'amount' => $transaction->amount,
+        'amount' => (int) $transaction->amount,
     ]);
 }
+
 
 }
