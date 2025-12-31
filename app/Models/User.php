@@ -12,6 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use App\Notifications\VerifyEmailCustom;
+use Illuminate\Support\Facades\Storage;
 
 
 
@@ -48,11 +49,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
-    protected $casts = [
-    'notif_cs' => 'boolean',
-    'notif_promo' => 'boolean',
-    'notif_update' => 'boolean',
-];
 
 
     /**
@@ -68,20 +64,31 @@ public function getAvatarUrlFullAttribute()
         ? Storage::url($this->avatar_url)
         : null;
 }
-
+protected static function booted()
+{
+    static::deleting(function ($user) {
+        if ($user->profile_photo_path &&
+            Storage::disk('public')->exists($user->profile_photo_path)) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
+    });
+}
 
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+protected function casts(): array
+{
+    return [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'notif_cs' => 'boolean',
+        'notif_promo' => 'boolean',
+        'notif_update' => 'boolean',
+    ];
+}
 public function sendEmailVerificationNotification()
 {
     $this->notify(new VerifyEmailCustom);

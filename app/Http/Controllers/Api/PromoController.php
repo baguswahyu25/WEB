@@ -10,42 +10,19 @@ use App\Models\FcmToken;
 
 class PromoController extends Controller
 {
-    public function index()
-    {
-        return response()->json(
-            Promo::where('is_active', true)->latest()->get()
-        );
-    }
+   public function index()
+{
+    return Promo::where('is_active', true)
+        ->latest()
+        ->get(); // 🔥 JANGAN MAP LAGI
+}
 
-    public function show($id)
-    {
-        return response()->json(
-            Promo::where('id', $id)
-                ->where('is_active', true)
-                ->firstOrFail()
-        );
-    }
+public function show($id)
+{
+    return Promo::where('id', $id)
+        ->where('is_active', true)
+        ->firstOrFail();
+}
 
-    // ===============================
-    // KIRIM NOTIFIKASI PROMO (FCM)
-    // ===============================
-    public function sendPromoNotification(
-        FirebaseNotificationService $firebase
-    ) {
-        $tokens = FcmToken::pluck('token');
-
-        foreach ($tokens as $token) {
-            $firebase->sendToToken(
-                $token,
-                'Promo Baru!',
-                'Diskon spesial hari ini'
-            );
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Notifikasi promo berhasil dikirim'
-        ]);
-    }
 }
 

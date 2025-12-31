@@ -32,6 +32,7 @@ protected $fillable = [
     'total_pertemuan',
     'sisa_pertemuan',
     'status_pendaftaran',
+    'status_pembayaran',
 ];
 
 
@@ -49,11 +50,18 @@ protected $fillable = [
      * * PENTING: Kita perlu menambahkan nama foreign key di sini
      * jika relasi tidak mengikuti konvensi nama.
      */
-    public function transaction()
-    {
-        // Parameter kedua adalah nama foreign key di tabel 'transactions'
-               return $this->hasOne(Transaction::class, 'pendaftaran_id');
-    }
+public function transactions()
+{
+    return $this->hasMany(Transaction::class, 'pendaftaran_id');
+}
+public function transaction()
+{
+    return $this->hasOne(Transaction::class, 'pendaftaran_id')
+                ->orderByDesc('created_at');
+}
+
+
+
         public function jadwalPertemuan()
     {
         return $this->hasMany(JadwalPertemuan::class);

@@ -16,6 +16,8 @@ return new class extends Migration
         $table->integer('sisa_pertemuan')->after('total_pertemuan');
         $table->enum('status_pendaftaran', ['aktif','selesai','dibatalkan'])
               ->default('aktif');
+        $table->enum('status_pembayaran', ['belum_bayar','dp','cicilan','lunas'])
+                ->default('belum_bayar');
     });
 }
 

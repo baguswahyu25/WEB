@@ -68,6 +68,7 @@ class ProfileController extends Controller
         'profile_photo_url' => $user->profile_photo_path
             ? asset('storage/' . $user->profile_photo_path)
             : null,
+
     ]
 ], 200);
 

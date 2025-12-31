@@ -69,9 +69,10 @@ class MidtransNotificationController extends Controller
                 $finalStatus = ($fraudStatus === 'accept') ? 'paid' : 'failed';
             } elseif ($transactionStatus === 'settlement') {
                 $finalStatus = 'paid';
-            } elseif (in_array($transactionStatus, ['cancel', 'expire', 'deny'])) {
+            } elseif (in_array($transactionStatus, ['cancel','expire','deny'])) {
                 $finalStatus = 'failed';
             }
+
             
             // ===============================
             // 5. Update database (atomic)
@@ -94,14 +95,30 @@ class MidtransNotificationController extends Controller
                 // 6. Efek ke PENDAFTARAN
                 // ===============================
                 if ($transaction->pendaftaran) {
-                    if ($finalStatus === 'paid') {
-                        Log::info("PENDAFTARAN {$transaction->pendaftaran->id} → PAID");
-                        // contoh:
-                        // $transaction->pendaftaran->update(['status' => 'aktif']);
-                    }
+                    if ($finalStatus === 'paid') {      
+                        if ($transaction->type === 'dp') {
+                            $transaction->pendaftaran->update([
+                                'status_pembayaran' => 'dp'
+                            ]);
+                        }
 
-                    if ($finalStatus === 'failed') {
-                        Log::warning("PENDAFTARAN {$transaction->pendaftaran->id} → FAILED");
+                        if ($transaction->type === 'cicilan') {
+
+                            $totalPaid = Transaction::where('pendaftaran_id', $transaction->pendaftaran_id)
+                                ->where('transaction_status', 'paid')
+                                ->sum('amount');
+
+                            if ($totalPaid >= $transaction->pendaftaran->harga) {
+                                $transaction->pendaftaran->update([
+                                    'status_pembayaran' => 'lunas'
+                                ]); 
+                            } else {
+                                $transaction->pendaftaran->update([
+                                    'status_pembayaran' => 'cicilan'
+                                ]);
+                            }
+                        }
+
                     }
                 }
             });
