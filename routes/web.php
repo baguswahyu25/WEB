@@ -6,7 +6,8 @@ use App\Http\Controllers\Auth\CustomResetPasswordController;
 use App\Http\Controllers\BayarController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SnapPaymentController;
-
+use App\Http\Controllers\FormPendaftaranController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,21 +16,21 @@ use App\Http\Controllers\SnapPaymentController;
 */
 Route::middleware('auth')->group(function () {
 
-    // 1. Dari card paket → form pendaftaran
-    Route::post('/bayar', 
+    // HALAMAN pembayaran (GET)
+    Route::get('/bayar/{pendaftaran}', 
         [BayarController::class, 'show']
     )->name('bayar.show');
-
-    // 2. Submit form pendaftaran → buat transaksi
-    Route::post('/payment', 
-        [PaymentController::class, 'store']
-    )->name('payment.store');
-
-    // 3. Redirect ke Midtrans Snap
+    // PROSES PENDAFTARAN (POST)
+    Route::post('/pendaftaran',
+    [FormPendaftaranController::class, 'store']
+    )->name('pendaftaran.store');
+    // Redirect ke Midtrans Snap
     Route::get('/payment/snap/{pendaftaran_id}', 
         [SnapPaymentController::class, 'show']
     )->name('payment.snap');
 });
+
+
 
 
 /*
@@ -74,9 +75,25 @@ Route::get('/support', function () {
     return view('support');
 });
 
-Route::get('/daftar', function () {
-    return view('pembayaran');
-});
+Route::get('/daftar', function (Request $request) {
+    abort_if(!$request->paket, 404);
+
+    $harga = match ($request->paket) {
+        'manual'         => 1500000,
+        'automatic'      => 1800000,
+        'manual_sim'     => 2150000,
+        'automatic_sim'  => 2450000,
+        default           => abort(404),
+    };
+
+return view('pendaftaran', [
+    'paket' => $request->paket,
+    'harga' => $harga,
+]);
+
+
+
+})->middleware('auth')->name('daftar');
 
 // rute perantara (tetap sama)
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -17,7 +17,7 @@ class FormPendaftaranController extends Controller
     public function store(Request $request)
 {
     $validated = $request->validate([
-        'paket'             => 'required|string',
+        'paket' => 'required|exists:paket_kursus,tipe',
         'nama_lengkap'      => 'required|string',
         'tempat_lahir'      => 'required|string',
         'tanggal_lahir'     => 'required|date_format:Y-m-d',
@@ -30,7 +30,7 @@ class FormPendaftaranController extends Controller
         'tipe_pendaftaran'  => 'required|in:sim,non_sim',
     ]);
 
-    $paket = PaketKursus::where('nama', $validated['paket'])->firstOrFail();
+    $paket = PaketKursus::where('tipe', $validated['paket'])->firstOrFail();
 
     DB::beginTransaction();
     try {
@@ -67,11 +67,17 @@ class FormPendaftaranController extends Controller
 
         DB::commit();
 
-        return response()->json([
-            'success' => true,
-            'pendaftaran_id' => $pendaftaran->id,
-            'transaction_id' => $transaction->id
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'pendaftaran_id' => $pendaftaran->id,
+                'transaction_id' => $transaction->id
+            ]);
+        }
+
+        // WEB
+        return redirect()
+            ->route('bayar.show', $pendaftaran->id);
 
     } catch (\Throwable $e) {
         DB::rollBack();

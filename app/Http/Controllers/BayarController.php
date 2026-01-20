@@ -3,14 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Pendaftaran;
 
 class BayarController extends Controller
 {
-    public function show(Request $request)
+    public function show($pendaftaranId)
     {
-        return view('payment.form', [
-            'paket' => $request->paket,
-            'harga' => $request->harga,
-        ]);
+        $pendaftaran = Pendaftaran::where('id', $pendaftaranId)
+        ->where('user_id', auth()->id())
+        ->firstOrFail();
+
+
+        return view('payment.form', compact('pendaftaran'));
+
     }
 }
