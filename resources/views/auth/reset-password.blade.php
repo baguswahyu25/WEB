@@ -21,25 +21,25 @@
 
                 <div class="block">
                     <x-label for="email" value="{{ __('Email') }}" class="text-[#000f3f]" />
-                    <x-input id="email" class="block mt-1 w-full"
-                        type="email" name="email"
-                        :value="old('email', $request->email)" required autofocus autocomplete="username" />
+                    <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)"
+                        required autofocus autocomplete="username" />
                 </div>
 
                 <div class="mt-4">
                     <x-label for="password" value="{{ __('Password') }}" class="text-[#000f3f]" />
-                    <x-input id="password" class="block mt-1 w-full"
-                        type="password" name="password" required autocomplete="new-password" />
+                    <x-input id="password" class="block mt-1 w-full" type="password" name="password" required
+                        autocomplete="new-password" />
                 </div>
 
                 <div class="mt-4">
                     <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" class="text-[#000f3f]" />
-                    <x-input id="password_confirmation" class="block mt-1 w-full"
-                        type="password" name="password_confirmation" required autocomplete="new-password" />
+                    <x-input id="password_confirmation" class="block mt-1 w-full" type="password"
+                        name="password_confirmation" required autocomplete="new-password" />
                 </div>
 
                 <div class="flex items-center justify-end mt-4">
-                    <button class="px-4 py-2 bg-[#f89331] text-white font-semibold rounded-lg shadow hover:bg-orange-500 transition">
+                    <button
+                        class="px-4 py-2 bg-[#f89331] text-white font-semibold rounded-lg shadow hover:bg-orange-500 transition">
                         Reset Password
                     </button>
                 </div>

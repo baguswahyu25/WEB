@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
+Route::middleware('auth')->group(function () {
+
     Route::get('/profile/keamanan', function () {
         return view('profile.keamanan'); 
     })->name('profile.keamanan');
@@ -46,7 +48,7 @@ Route::middleware('auth')->group(function () {
         return view('profile.notifications'); 
     })->name('profile.notifications');
 
-
+});
 
     /*
 |--------------------------------------------------------------------------
@@ -93,12 +95,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('user.dashboard')->middleware('is_user'); // <--- Tambahkan pagar ini
 });
 
-// 3. Rute Khusus Admin (File: resources/views/admin/dashboard.blade.php)
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard'); // Mengarah ke folder admin/dashboard
-    })->name('dashboard');
-});
+// // 3. Rute Khusus Admin (File: resources/views/admin/dashboard.blade.php)
+// Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+//     Route::get('/dashboard', function () {
+//         return view('admin.dashboard'); // Mengarah ke folder admin/dashboard
+//     })->name('dashboard');
+// });
 
 // routes/web.php
 Route::get('/email-verified-success', function () {

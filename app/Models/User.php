@@ -13,11 +13,13 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use App\Notifications\VerifyEmailCustom;
 use Illuminate\Support\Facades\Storage;
+use Filament\Models\Contracts\FilamentUser; // <--- Tambahkan ini
+use Filament\Panel; // <--- Tambahkan ini
 
 
 
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -73,6 +75,17 @@ protected static function booted()
         }
     });
 }
+
+
+/**
+ * Menentukan siapa yang boleh masuk ke Panel Filament
+ */
+public function canAccessPanel(Panel $panel): bool
+{
+    // Cek apakah kolom 'role' di database isinya 'admin'
+    return $this->role === 'admin';
+}
+
 
     /**
      * Get the attributes that should be cast.

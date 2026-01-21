@@ -21,6 +21,7 @@
             use App\Http\Controllers\Api\PaketKursusController;
             use App\Http\Controllers\Api\JadwalPertemuanController;
             use App\Http\Controllers\Api\TransactionController;
+            
 
 
             Route::post('/midtrans/notification', [MidtransNotificationController::class, 'handle'])->name('midtrans.notification');
@@ -92,19 +93,19 @@
                     [JadwalPertemuanController::class, 'selesai']
                 );
 
-                Route::get(
-                    '/pendaftaran/{id}/cicilan',
-                    [RiwayatCicilanController::class, 'index']
-                );
+                // Route::get(
+                //     '/pendaftaran/{id}/cicilan',
+                //     [RiwayatCicilanController::class, 'index']
+                // );
 
             });
 
-            Route::prefix('admin')->group(function () {
-                Route::get('/faq', [FaqController::class, 'index']);
-                Route::post('/faq', [FaqController::class, 'store']);
-                Route::put('/faq/{id}', [FaqController::class, 'update']);
-                Route::delete('/faq/{id}', [FaqController::class, 'destroy']);
-            });
+            // Route::prefix('admin')->group(function () {
+            //     Route::get('/faq', [FaqController::class, 'index']);
+            //     Route::post('/faq', [FaqController::class, 'store']);
+            //     Route::put('/faq/{id}', [FaqController::class, 'update']);
+            //     Route::delete('/faq/{id}', [FaqController::class, 'destroy']);
+            // });
             /**
              * ===========================
              * BOT CHAT (USER)
