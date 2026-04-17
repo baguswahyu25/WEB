@@ -80,12 +80,12 @@ Route::get('/support', function () {
 Route::get('/daftar', function (Request $request) {
     abort_if(!$request->paket, 404);
 
-    $harga = match ($request->paket) {
-        'manual'         => 1500000,
+      $harga = match ($request->paket) {
+        'manual'         => 2150000,
         'automatic'      => 1800000,
         'manual_sim'     => 2150000,
         'automatic_sim'  => 2450000,
-        default           => abort(404),
+        default          => abort(404),
     };
 
 return view('pendaftaran', [

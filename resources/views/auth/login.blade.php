@@ -30,7 +30,7 @@
                     <x-input id="email" class="block mt-1 w-full" type="text" name="email" :value="old('email')"
                         placeholder="Email" required autofocus autocomplete="email" />
                     @error('email')
-                        <p class="text-sm text-red-500 mt-1">{{ 'Pastikan email anda benar' }}</p>
+                        <p class="text-sm text-red-500 mt-1">{{ 'Pastikan email dan password anda benar' }}</p>
                     @enderror
                 </div>
                 {{-- end user --}}
@@ -44,7 +44,7 @@
                         <x-input id="password" class="block mt-1 w-full" type="password" name="password"
                             :value="old('password')" placeholder="Password" required autofocus autocomplete="password" />
                         @error('password')
-                            <p class="text-sm text-red-500 mt-1">{{ 'Pastikan passwprd anda benar' }}</p>
+                            <p class="text-sm text-red-500 mt-1">{{ 'Pastikan password anda benar' }}</p>
                         @enderror
                     </div>
 

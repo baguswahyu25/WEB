@@ -1,13 +1,10 @@
 <?php
 
-// database/seeders/AdminUserSeeder.php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User; // Pastikan model User diimpor
+use App\Models\User;
 
 class AdminUserSeeder extends Seeder
 {
@@ -16,15 +13,17 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Pastikan Anda tidak membuat admin duplikat
-        if (User::where('email', 'admin@example.com')->doesntExist()) {
+        // Cek apakah admin sudah ada
+        if (User::where('email', 'samsgtaja05@gmail.com')->doesntExist()) {
+
             User::create([
                 'name' => 'Adminkeren',
                 'email' => 'samsgtaja05@gmail.com',
-                // PENTING: Hash kata sandi! Gunakan kata sandi yang kuat
-                'password' => Hash::make('1234512345'), 
-                'role' => 'admin', // Ini yang membedakan
+                 'email_verified_at' => now(), // langsung dianggap verified
+                'password' => Hash::make('1234512345'), // password akan di-hash
+                'role' => 'admin',
             ]);
+
         }
     }
 }

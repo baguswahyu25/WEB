@@ -40,21 +40,11 @@
                 </a>
             @endguest
 
-
             @auth
-            <a href="{{ route('daftar', ['paket' => 'manual']) }}"
-
-            class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500
-                    text-white font-bold px-10 py-3 rounded-full shadow">
-                Daftar & Bayar
-            </a>
-
-
-
-                {{-- <a href="{{ route('bayar.show', ['paket' => 'Manual', 'harga' => 2150000]) }}"
+                <a href="{{ route('daftar', ['paket' => 'manual']) }}"
                     class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
                     Rp 2.150.000
-                </a> --}}
+                </a>
             @endauth
         </div>
 
@@ -92,10 +82,19 @@
                 </ul>
             </div>
 
-            <button
-                class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow">
-                Rp 2.450.000
-            </button>
+            @guest
+                <a href="/login"
+                    class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
+                    Rp 2.450.000
+                </a>
+            @endguest
+
+            @auth
+                <a href="{{ route('daftar', ['paket' => 'matic']) }}"
+                    class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
+                    Rp 2.450.000
+                </a>
+            @endauth
         </div>
 
         <!-- CARD SIM -->
@@ -126,10 +125,19 @@
                 </ul>
             </div>
 
-            <button
-                class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow">
-                Rp 2.570.000
-            </button>
+            @guest
+                <a href="/login"
+                    class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
+                    Rp 2.575.000
+                </a>
+            @endguest
+
+            @auth
+                <a href="{{ route('daftar', ['paket' => 'sim']) }}"
+                    class="mt-auto mx-auto bg-orange-400 hover:bg-orange-500 text-white font-bold px-10 py-3 rounded-full shadow text-center block">
+                    Rp 2.575.000
+                </a>
+            @endauth
         </div>
 
     </div>

@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             PaketKursusSeeder::class,
             FaqSeeder::class,
             PromoSeeder::class,
+            AdminUserSeeder::class,
         ]);
     }
 }
