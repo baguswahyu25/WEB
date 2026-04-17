@@ -16,8 +16,9 @@ class FormPendaftaranController extends Controller
 {
     public function store(Request $request)
 {
+    
     $validated = $request->validate([
-        'paket' => 'required|exists:paket_kursus,tipe',
+        'paket' => 'required|exists:paket_kursus,nama',
         'nama_lengkap'      => 'required|string',
         'tempat_lahir'      => 'required|string',
         'tanggal_lahir'     => 'required|date_format:Y-m-d',
@@ -29,9 +30,19 @@ class FormPendaftaranController extends Controller
         'opsi_kredit'       => 'nullable|string',
         'tipe_pendaftaran'  => 'required|in:sim,non_sim',
     ]);
+    $aktif = Pendaftaran::where('user_id', $request->user()->id)
+        ->where('status_pendaftaran', 'aktif')
+        ->where('sisa_pertemuan', '>', 0)
+        ->exists();
 
-    $paket = PaketKursus::where('tipe', $validated['paket'])->firstOrFail();
-
+    if ($aktif) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Selesaikan pertemuan terlebih dahulu sebelum mendaftar lagi'
+        ], 409);
+    }
+    $paket = PaketKursus::where('nama', $validated['paket'])->firstOrFail();
+    \Log::info('PAKET MASUK: ' . $request->paket);
     DB::beginTransaction();
     try {
 

@@ -11,13 +11,13 @@ use Illuminate\Support\Facades\DB;
 
 class JadwalPertemuanController extends Controller
 {
-   public function store(Request $request)
+public function store(Request $request)
 {
     $request->validate([
         'pendaftaran_id' => 'required|exists:pendaftaran,id',
         'pertemuan_ke'   => 'required|integer|min:1',
         'tanggal'        => 'required|date',
-        'jam' => 'required|date_format:H:i'
+        'jam'            => 'required|date_format:H:i'
     ]);
 
     $pendaftaran = Pendaftaran::findOrFail($request->pendaftaran_id);
@@ -34,6 +34,24 @@ class JadwalPertemuanController extends Controller
         ], 422);
     }
 
+    if ($pendaftaran->user_id !== auth()->id()) {
+        return response()->json([
+            'message' => 'Tidak berhak'
+        ], 403);
+    }
+
+    $paidStatuses = ['paid', 'settlement', 'capture'];
+
+    if (
+        !$pendaftaran->transaction ||
+        !in_array($pendaftaran->transaction->transaction_status, $paidStatuses)
+    ) {
+        return response()->json([
+            'message' => 'Pembayaran belum selesai'
+        ], 403);
+    }
+
+    // ❗ CEK DULU PER PERTEMUAN
     $exists = JadwalPertemuan::where('pendaftaran_id', $pendaftaran->id)
         ->where('pertemuan_ke', $request->pertemuan_ke)
         ->exists();
@@ -43,50 +61,20 @@ class JadwalPertemuanController extends Controller
             'message' => 'Pertemuan ini sudah diajukan'
         ], 409);
     }
-    if ($pendaftaran->user_id !== auth()->id()) {
-    return response()->json([
-        'message' => 'Tidak berhak mengakses jadwal ini'
-    ], 403);
-}
-$paidStatuses = ['paid', 'settlement', 'capture'];
 
-if (
-    !$pendaftaran->transaction ||
-    !in_array($pendaftaran->transaction->transaction_status, $paidStatuses)
-) {
-    return response()->json([
-        'message' => 'Pembayaran belum selesai'
-    ], 403);
-}
-try {
-    // kode store kamu
-} catch (\Throwable $e) {
-    \Log::error('ERROR SIMPAN JADWAL', [
-        'message' => $e->getMessage(),
-        'line' => $e->getLine(),
-        'file' => $e->getFile(),
-        'trace' => $e->getTraceAsString()
-    ]);
+    // ❗ CEK JAM BENTROK SEBELUM INSERT
+    $jamBentrok = JadwalPertemuan::where('tanggal', $request->tanggal)
+        ->where('jam', $request->jam)
+        ->whereIn('status', ['pending', 'approved'])
+        ->exists();
 
-    return response()->json([
-        'message' => 'Terjadi kesalahan server',
-        'error' => $e->getMessage()
-    ], 500);
-}
+    if ($jamBentrok) {
+        return response()->json([
+            'message' => 'Jam ini sudah dipakai'
+        ], 409);
+    }
 
-$jamBentrok = JadwalPertemuan::where('tanggal', $request->tanggal)
-    ->where('jam', $request->jam)
-    ->whereIn('status', ['pending', 'approved'])
-    ->exists();
-
-if ($jamBentrok) {
-    return response()->json([
-        'message' => 'Jam ini sudah dipakai'
-    ], 409);
-}
-$jadwal = null;
-
-DB::transaction(function () use ($request, $pendaftaran, &$jadwal) {
+    // ✅ BARU SIMPAN SEKALI
     $jadwal = JadwalPertemuan::create([
         'pendaftaran_id' => $pendaftaran->id,
         'pertemuan_ke'   => $request->pertemuan_ke,
@@ -94,8 +82,6 @@ DB::transaction(function () use ($request, $pendaftaran, &$jadwal) {
         'jam'            => $request->jam,
         'status'         => 'pending'
     ]);
-
-});
 
     return response()->json([
         'message' => 'Jadwal berhasil diajukan',
