@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class MidtransCallbackController extends Controller
 {
-    public function handle(Request $request)
+public function handle(Request $request)
 {
     $orderId = $request->order_id;
     $midtransStatus = $request->transaction_status;
@@ -16,27 +16,29 @@ class MidtransCallbackController extends Controller
     $transaction = Transaction::where('midtrans_order_id', $orderId)->firstOrFail();
     $pendaftaran = Pendaftaran::findOrFail($transaction->pendaftaran_id);
 
-    // ✅ Update status transaksi
+    // ✅ Mapping status
     if (in_array($midtransStatus, ['settlement', 'capture'])) {
-        $transaction->transaction_status = 'settlement';
+        $transaction->transaction_status = 'paid';
+        $transaction->paid_at = now();
     } elseif ($midtransStatus === 'pending') {
         $transaction->transaction_status = 'pending';
+    } elseif (in_array($midtransStatus, ['expire', 'cancel'])) {
+        $transaction->transaction_status = 'expire';
     } else {
         $transaction->transaction_status = 'failed';
     }
+
     $transaction->save();
 
     // ======================
-    // UPDATE STATUS PENDAFTARAN
+    // UPDATE PENDAFTARAN
     // ======================
 
-    // DP
-    if ($transaction->type === 'dp' && $transaction->transaction_status === 'settlement') {
+    if ($transaction->type === 'dp' && $transaction->transaction_status === 'paid') {
         $pendaftaran->status_pembayaran = 'dp';
     }
 
-    // CICILAN
-    if ($transaction->type === 'cicilan' && $transaction->transaction_status === 'settlement') {
+    if ($transaction->type === 'cicilan' && $transaction->transaction_status === 'paid') {
 
         $totalCicilan = Transaction::where('pendaftaran_id', $pendaftaran->id)
             ->where('type', 'cicilan')
@@ -44,7 +46,7 @@ class MidtransCallbackController extends Controller
 
         $cicilanLunas = Transaction::where('pendaftaran_id', $pendaftaran->id)
             ->where('type', 'cicilan')
-            ->where('transaction_status', 'settlement')
+            ->where('transaction_status', 'paid')
             ->count();
 
         if ($cicilanLunas >= $totalCicilan) {
@@ -54,13 +56,12 @@ class MidtransCallbackController extends Controller
         }
     }
 
-    // LUNAS SEKALIGUS
-    if ($transaction->type === 'lunas' && $transaction->transaction_status === 'settlement') {
+    if ($transaction->type === 'lunas' && $transaction->transaction_status === 'paid') {
         $pendaftaran->status_pembayaran = 'lunas';
     }
 
     $pendaftaran->save();
-
+\Log::info('MIDTRANS CALLBACK MASUK', $request->all());
     return response()->json(['message' => 'OK']);
 }
 }
